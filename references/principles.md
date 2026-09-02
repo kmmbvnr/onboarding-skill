@@ -13,6 +13,8 @@ Use these rules:
 - Use `recognize`, `operate`, and `modify` as knowledge targets.
 - Check a prerequisite before teaching it. Let experienced people skip it.
 - Give a beginner an easy early win before a complex project path.
+- Keep each node between 5 and 20 minutes. Split work that can exceed 25 minutes.
+- Put a small real change near the start. Expand the map after the learner earns evidence.
 - Use a small lab outside product code when a required technology is missing.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.

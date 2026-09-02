@@ -41,10 +41,12 @@ Ask one short question only when the directory or intent is unclear.
 - Do not use onboarding as permission to edit product code, install software, deploy, or contact people.
 - Never measure success by time or number of completed nodes alone. Require observable evidence.
 
-Render the map with:
+Render later state changes with:
 
 ```bash
 python3 <skill-directory>/scripts/render_map.py .onboarding/state.json
 ```
 
-The renderer validates the state before it writes the HTML file.
+Use `--open` for the first project plan or self-tour. The renderer validates the
+state before it writes the HTML file. The open page checks for a new render
+every 10 seconds.

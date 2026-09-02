@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
 import sys
+import webbrowser
 from pathlib import Path
 
 
@@ -144,8 +146,8 @@ def validate(state: dict) -> None:
         if not isinstance(node.get("project_paths"), list):
             fail(f"{label}.project_paths must be an array")
         minutes = node.get("estimated_minutes")
-        if not isinstance(minutes, int) or minutes < 1:
-            fail(f"{label}.estimated_minutes must be a positive integer")
+        if not isinstance(minutes, int) or not 1 <= minutes <= 25:
+            fail(f"{label}.estimated_minutes must be between 1 and 25; split longer work")
 
     for index, node in enumerate(nodes):
         for requirement in node["requires"]:
@@ -205,7 +207,45 @@ def esc(value: object) -> str:
     return html.escape(str(value), quote=True)
 
 
-def render_node(node: dict, index: int, labels: dict) -> str:
+UI_TEXT = {
+    "en": {
+        "claim": "Claim reward",
+        "claimed": "Reward claimed",
+        "locked": "Locked",
+        "skipped": "Skipped",
+        "copied": "Copied",
+        "rewards": "rewards",
+        "live": "Auto-updates",
+        "status": {
+            "ready": "Ready",
+            "active": "Now",
+            "done": "Done",
+            "revisit": "Try again",
+            "locked": "Locked",
+            "skipped": "Skipped",
+        },
+    },
+    "ru": {
+        "claim": "Забрать награду",
+        "claimed": "Награда получена",
+        "locked": "Пока закрыто",
+        "skipped": "Пропущено",
+        "copied": "Команда скопирована",
+        "rewards": "наград",
+        "live": "Обновляется автоматически",
+        "status": {
+            "ready": "Можно начать",
+            "active": "Сейчас",
+            "done": "Готово",
+            "revisit": "Повторить",
+            "locked": "Закрыто",
+            "skipped": "Пропущено",
+        },
+    },
+}
+
+
+def render_node(node: dict, index: int, labels: dict, ui: dict) -> str:
     status = node["status"]
     paths = "".join(f"<code>{esc(path)}</code>" for path in node["project_paths"])
     requires = ", ".join(node["requires"]) or labels["none"]
@@ -213,13 +253,24 @@ def render_node(node: dict, index: int, labels: dict) -> str:
     image = ""
     if node["image"]:
         image = f'<img class="node-image" src="{esc(node["image"])}" alt="">'
+    if status == "done":
+        action = (
+            f'<button class="reward" type="button" data-reward="{esc(node["codename"])}">'
+            f'⭐ {esc(ui["claim"])}</button>'
+        )
+    elif status == "locked":
+        action = f'<button type="button" disabled>🔒 {esc(ui["locked"])}</button>'
+    elif status == "skipped":
+        action = f'<p class="terminal-status">{esc(ui["skipped"])}</p>'
+    else:
+        action = f'<button type="button" data-command="{esc(command)}">{esc(command)}</button>'
     return f"""
-    <article class="node {esc(status)}" data-status="{esc(status)}" id="{esc(node['codename'])}">
+    <article class="node {esc(status)}" data-status="{esc(status)}" data-code="{esc(node['codename'])}" id="{esc(node['codename'])}">
       <div class="step">{index + 1}</div>
       <div class="badge" aria-hidden="true">{esc(node['icon'])}</div>
       <div class="card">
         {image}
-        <div class="meta"><span>{node['estimated_minutes']} {esc(labels['minutes'])}</span></div>
+        <div class="meta"><span>{node['estimated_minutes']} {esc(labels['minutes'])}</span><span class="status-pill">{esc(ui['status'][status])}</span></div>
         <p class="codename">{esc(node['codename'])}</p>
         <h2>{esc(node['title'])}</h2>
         <p>{esc(node['summary'])}</p>
@@ -232,7 +283,7 @@ def render_node(node: dict, index: int, labels: dict) -> str:
           </dl>
           <div class="paths">{paths}</div>
         </details>
-        <button type="button" data-command="{esc(command)}">{esc(command)}</button>
+        {action}
       </div>
     </article>"""
 
@@ -243,48 +294,68 @@ def render(state: dict) -> str:
     labels = state["labels"]
     theme = state["theme"]
     nodes = state["nodes"]
+    ui = UI_TEXT.get(str(state["language"]).split("-")[0], UI_TEXT["en"])
     complete = sum(node["status"] in {"done", "skipped"} for node in nodes)
     percent = round(complete * 100 / len(nodes))
-    node_html = "\n".join(render_node(node, index, labels) for index, node in enumerate(nodes))
+    build_id = hashlib.sha256(
+        json.dumps(state, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()[:16]
+    project_key = hashlib.sha256(project["root"].encode("utf-8")).hexdigest()[:16]
+    path_color = theme["path"].replace("#", "%23")
+    node_html = "\n".join(
+        render_node(node, index, labels, ui) for index, node in enumerate(nodes)
+    )
     return f"""<!doctype html>
 <html lang="{esc(state['language'])}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="onboarding-build" content="{build_id}">
 <title>{esc(project['name'])}</title>
 <style>
 :root{{--ink:{theme['ink']};--muted:{theme['muted']};--paper:{theme['paper']};--grass:{theme['background_bottom']};--grass2:{theme['background_top']};--path:{theme['path']};--line:{theme['muted']};--ready:{theme['accent']};--done:{theme['done']};--locked:{theme['locked']};--active:{theme['accent']};--revisit:{theme['revisit']};}}
-*{{box-sizing:border-box}} html{{scroll-behavior:smooth}} body{{margin:0;color:var(--ink);font:16px/1.45 ui-rounded,"SF Pro Rounded",system-ui,sans-serif;background:linear-gradient(var(--grass2),var(--grass) 52%,var(--paper))}}
-header{{position:sticky;top:0;z-index:5;padding:14px 20px;background:rgba(255,253,242,.92);backdrop-filter:blur(10px);border-bottom:2px solid rgba(38,50,37,.15)}}
-.top{{max-width:840px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}} h1{{font-size:clamp(22px,5vw,38px);line-height:1.05;margin:0}} .goal{{margin:6px 0 0;color:var(--muted)}}
-.meter{{min-width:150px;text-align:right;font-weight:800}} progress{{display:block;width:150px;height:12px;accent-color:var(--done)}}
-.filters{{max-width:840px;margin:10px auto 0;display:flex;gap:6px;overflow:auto}} .filters button{{white-space:nowrap}}
-main{{position:relative;max-width:840px;margin:auto;padding:42px 18px 120px;overflow:hidden}} main:before{{content:"";position:absolute;left:50%;top:0;bottom:0;width:58px;transform:translateX(-50%);background:var(--path);border:3px solid rgba(143,117,67,.35);border-radius:45% 55% 48% 52%;box-shadow:inset 0 0 0 8px rgba(255,255,255,.22)}}
-.node{{position:relative;display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;min-height:230px}} .node:nth-child(odd) .card{{grid-column:1}} .node:nth-child(even) .card{{grid-column:3}} .node:nth-child(odd) .badge,.node:nth-child(even) .badge{{grid-column:2}}
-.badge{{grid-row:1;z-index:2;justify-self:center;display:grid;place-items:center;width:70px;height:70px;font-size:31px;background:var(--paper);border:5px solid var(--ready);border-radius:50%;box-shadow:0 7px 0 rgba(79,83,45,.2)}}
-.step{{position:absolute;left:calc(50% + 34px);top:74px;z-index:3;background:var(--ink);color:#fff;border-radius:10px;padding:2px 7px;font-size:12px;font-weight:800}}
-.card{{grid-row:1;background:var(--paper);border:2px solid rgba(38,50,37,.18);border-radius:22px;padding:18px;box-shadow:0 9px 0 rgba(80,85,47,.16);max-width:340px}} .node:nth-child(odd) .card{{justify-self:end}} .node:nth-child(even) .card{{justify-self:start}}
-.node-image{{display:block;width:100%;height:120px;object-fit:cover;border-radius:13px;margin-bottom:12px}}
-.meta{{display:flex;gap:6px;flex-wrap:wrap}} .meta span,.codename{{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}} .meta span{{padding:3px 7px;background:#edf0df;border-radius:20px}} .codename{{color:var(--active);margin:12px 0 2px}} h2{{font-size:21px;line-height:1.1;margin:0 0 8px}} p{{margin:7px 0}} details{{margin-top:12px}} summary{{cursor:pointer;font-weight:750}} dl{{display:grid;grid-template-columns:70px 1fr;gap:5px;margin:10px 0}} dt{{font-weight:800}} dd{{margin:0}} .paths{{display:flex;gap:5px;flex-wrap:wrap}} code{{background:#eef0e3;border-radius:5px;padding:2px 5px;font-size:12px}}
-button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;padding:7px 10px;cursor:pointer;font-weight:700}} .card>button{{width:100%;margin-top:12px;background:var(--ink);color:white}}
-.done .badge{{border-color:var(--done)}} .active .badge{{border-color:var(--active);animation:pulse 1.6s infinite}} .revisit .badge{{border-color:var(--revisit)}} .locked{{filter:grayscale(.8);opacity:.62}} .skipped{{opacity:.67}} .hidden{{display:none}}
-@keyframes pulse{{50%{{transform:scale(1.08)}}}}
-.legend{{max-width:840px;margin:auto;padding:0 20px 40px;color:var(--muted)}}
-@media(max-width:680px){{.top{{grid-template-columns:1fr}}.meter{{text-align:left}}.node{{grid-template-columns:68px 1fr;min-height:210px}}main:before{{left:51px}}.node .badge,.node:nth-child(odd) .badge,.node:nth-child(even) .badge{{grid-column:1;justify-self:center}}.node .card,.node:nth-child(odd) .card,.node:nth-child(even) .card{{grid-column:2;justify-self:stretch;max-width:none}}.step{{left:69px;top:70px}}}}
-@media print{{header{{position:static}}.filters,.card>button{{display:none}}body{{background:#fff}}main:before{{background:#f3e8c7}}.node{{break-inside:avoid}}}}
+*{{box-sizing:border-box}} html{{scroll-behavior:smooth}} body{{margin:0;color:var(--ink);font:15px/1.4 ui-rounded,"SF Pro Rounded",system-ui,sans-serif;background:linear-gradient(155deg,var(--grass2),var(--grass) 58%,var(--paper));min-height:100vh}}
+header{{position:sticky;top:0;z-index:10;padding:12px 18px;background:color-mix(in srgb,var(--paper) 91%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid rgba(38,50,37,.14)}}
+.top{{max-width:920px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}} h1{{font-size:clamp(22px,4vw,34px);line-height:1.05;margin:0}} .goal{{max-width:650px;margin:5px 0 0;color:var(--muted);font-size:14px}}
+.score{{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--paper);border:1px solid rgba(38,50,37,.14);border-radius:16px;box-shadow:0 4px 12px rgba(38,50,37,.08)}} .meter{{min-width:130px;text-align:right;font-weight:850}} progress{{display:block;width:130px;height:9px;accent-color:var(--done)}} #reward-count{{font-size:18px;font-weight:900;white-space:nowrap}}
+.filters{{max-width:920px;margin:9px auto 0;display:flex;gap:6px;overflow:auto}} .filters button{{white-space:nowrap}} .live{{margin-left:auto;color:var(--muted);font-size:12px;align-self:center;white-space:nowrap}}
+main{{position:relative;max-width:920px;margin:auto;padding:30px 18px 100px;overflow:hidden}} .trail{{position:absolute;z-index:0;left:50%;top:0;bottom:0;width:150px;transform:translateX(-50%);background-size:150px 360px;background-repeat:repeat-y;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 360'%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='{path_color}' stroke-width='58' stroke-linecap='round'/%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='%23ffffff' stroke-opacity='.58' stroke-width='3' stroke-dasharray='7 12'/%3E%3C/svg%3E");filter:drop-shadow(0 3px 0 rgba(38,50,37,.12))}}
+.node{{position:relative;z-index:1;display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;min-height:178px}} .node:nth-child(odd) .card{{grid-column:1}} .node:nth-child(even) .card{{grid-column:3}} .node .badge{{grid-column:2}}
+.badge{{grid-row:1;z-index:2;justify-self:center;display:grid;place-items:center;width:62px;height:62px;font-size:28px;background:var(--paper);border:4px solid var(--ready);border-radius:50%;box-shadow:0 6px 0 rgba(38,50,37,.18),0 10px 22px rgba(38,50,37,.12)}} .node:nth-child(4n+1) .badge{{transform:translateX(-30px)}} .node:nth-child(4n+2) .badge{{transform:translateX(24px)}} .node:nth-child(4n+3) .badge{{transform:translateX(38px)}}
+.step{{position:absolute;left:calc(50% + 38px);top:52px;z-index:3;background:var(--ink);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}}
+.card{{grid-row:1;background:color-mix(in srgb,var(--paper) 94%,white);border:1px solid rgba(38,50,37,.16);border-radius:18px;padding:14px;box-shadow:0 6px 0 rgba(38,50,37,.12),0 12px 30px rgba(38,50,37,.08);max-width:330px}} .node:nth-child(odd) .card{{justify-self:end}} .node:nth-child(even) .card{{justify-self:start}}
+.node-image{{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:10px}} .meta{{display:flex;gap:6px;flex-wrap:wrap}} .meta span,.codename{{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}} .meta span{{padding:3px 7px;background:rgba(255,255,255,.72);border-radius:999px}} .status-pill{{color:var(--active)}} .codename{{color:var(--active);margin:9px 0 2px}} h2{{font-size:19px;line-height:1.12;margin:0 0 5px}} p{{margin:5px 0}} details{{margin-top:8px}} summary{{cursor:pointer;font-weight:800}} dl{{display:grid;grid-template-columns:70px 1fr;gap:5px;margin:8px 0}} dt{{font-weight:800}} dd{{margin:0}} .paths{{display:flex;gap:5px;flex-wrap:wrap}} code{{background:#eef0e3;border-radius:5px;padding:2px 5px;font-size:11px}}
+button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;padding:7px 10px;cursor:pointer;font-weight:800}} button:focus-visible{{outline:3px solid var(--active);outline-offset:2px}} .card>button{{width:100%;margin-top:9px;background:var(--ink);color:white}} .card>button:disabled{{cursor:not-allowed;background:var(--locked)}} .card>.reward{{background:linear-gradient(135deg,#ffd85a,#ff9d45);color:#3d2600;border-color:#e28d20;box-shadow:0 4px 0 #c87516}} .card>.reward.claimed{{background:var(--done);color:#fff;border-color:var(--done);box-shadow:none}} .terminal-status{{font-weight:800;color:var(--muted)}}
+.done .badge{{border-color:var(--done)}} .active .badge{{border-color:var(--active);animation:pulse 1.6s infinite}} .revisit .badge{{border-color:var(--revisit)}} .locked{{opacity:.58}} .skipped{{opacity:.65}} .hidden{{display:none}} .toast{{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 14px;background:var(--ink);color:white;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.2s}} .toast.show{{opacity:1;transform:translate(-50%,-6px)}} .spark{{position:fixed;z-index:40;pointer-events:none;font-size:22px;animation:burst .85s ease-out forwards}}
+@keyframes pulse{{50%{{scale:1.08}}}} @keyframes burst{{to{{translate:var(--x) var(--y);rotate:var(--r);opacity:0;scale:.5}}}}
+.legend{{max-width:920px;margin:auto;padding:0 20px 36px;color:var(--muted);text-align:center}}
+@media(max-width:700px){{.top{{grid-template-columns:1fr}}.score{{justify-content:space-between}}.meter{{text-align:left}}.live{{display:none}}main{{padding-left:10px}}.trail{{left:49px;width:92px;background-size:92px 280px}}.node{{grid-template-columns:82px 1fr;min-height:166px}}.node .badge,.node:nth-child(odd) .badge,.node:nth-child(even) .badge{{grid-column:1;justify-self:center;transform:none}}.node .card,.node:nth-child(odd) .card,.node:nth-child(even) .card{{grid-column:2;justify-self:stretch;max-width:none}}.step{{left:65px;top:49px}}}}
+@media(prefers-reduced-motion:reduce){{*{{scroll-behavior:auto!important;animation:none!important;transition:none!important}}}} @media print{{header{{position:static}}.filters,.card>button,.trail{{display:none}}body{{background:#fff}}.node{{break-inside:avoid}}}}
 </style>
 </head>
 <body>
 <header>
-  <div class="top"><div>{f'<img src="{esc(theme["logo"])}" alt="" style="max-width:120px;max-height:42px;margin-bottom:8px">' if theme['logo'] else ''}<h1>{esc(project['name'])}</h1><p class="goal">{esc(project['goal'])}<br>{esc(learner['role'])}</p></div><div class="meter">{complete}/{len(nodes)} {esc(labels['nodes'])}<progress value="{complete}" max="{len(nodes)}">{percent}%</progress></div></div>
-  <nav class="filters"><button data-filter="all">{esc(labels['filter_all'])}</button><button data-filter="ready">{esc(labels['filter_ready'])}</button><button data-filter="active">{esc(labels['filter_active'])}</button><button data-filter="done">{esc(labels['filter_done'])}</button><button data-filter="revisit">{esc(labels['filter_revisit'])}</button></nav>
+  <div class="top"><div>{f'<img src="{esc(theme["logo"])}" alt="" style="max-width:110px;max-height:36px;margin-bottom:6px">' if theme['logo'] else ''}<h1>{esc(project['name'])}</h1><p class="goal">{esc(project['goal'])}<br>{esc(learner['role'])}</p></div><div class="score"><span id="reward-count">0 ⭐</span><div class="meter">{complete}/{len(nodes)} {esc(labels['nodes'])}<progress value="{complete}" max="{len(nodes)}">{percent}%</progress></div></div></div>
+  <nav class="filters"><button data-filter="all" aria-pressed="true">{esc(labels['filter_all'])}</button><button data-filter="ready">{esc(labels['filter_ready'])}</button><button data-filter="active">{esc(labels['filter_active'])}</button><button data-filter="done">{esc(labels['filter_done'])}</button><button data-filter="revisit">{esc(labels['filter_revisit'])}</button><span class="live">↻ {esc(ui['live'])}</span></nav>
 </header>
-<main>{node_html}</main>
+<main><div class="trail" aria-hidden="true"></div>{node_html}</main>
 <p class="legend">{percent}% · {esc(labels['footer'])}</p>
+<div class="toast" role="status" aria-live="polite"></div>
 <script>
+const buildId='{build_id}';
+const storageKey='onboarding:{project_key}';
+const viewKey=storageKey+':view';
+const toast=document.querySelector('.toast');
+let activeFilter='all';
+function showToast(message){{toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1400)}}
+function applyFilter(filter){{
+  activeFilter=filter;
+  document.querySelectorAll('[data-filter]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.filter===filter)));
+  document.querySelectorAll('.node').forEach(node=>node.classList.toggle('hidden',filter!=='all'&&node.dataset.status!==filter));
+}}
 document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{{
   const filter=button.dataset.filter;
-  document.querySelectorAll('.node').forEach(node=>node.classList.toggle('hidden',filter!=='all'&&node.dataset.status!==filter));
+  applyFilter(filter);
 }}));
 async function copyText(value) {{
   if (navigator.clipboard && window.isSecureContext) {{
@@ -295,8 +366,47 @@ async function copyText(value) {{
 }}
 document.querySelectorAll('[data-command]').forEach(button=>button.addEventListener('click',async()=>{{
   await copyText(button.dataset.command);
-  const old=button.textContent; button.textContent='✓ '+old; setTimeout(()=>button.textContent=old,1200);
+  showToast('{esc(ui['copied'])}');
 }}));
+let claims;
+try{{claims=new Set(JSON.parse(localStorage.getItem(storageKey)||'[]'))}}catch(error){{claims=new Set()}}
+const earnedCodes=new Set([...document.querySelectorAll('[data-reward]')].map(button=>button.dataset.reward));
+claims=new Set([...claims].filter(code=>earnedCodes.has(code)));
+function updateRewards(){{
+  document.querySelectorAll('[data-reward]').forEach(button=>{{
+    const claimed=claims.has(button.dataset.reward);
+    button.classList.toggle('claimed',claimed);
+    button.textContent=claimed?'✓ {esc(ui['claimed'])}':'⭐ {esc(ui['claim'])}';
+  }});
+  document.querySelector('#reward-count').textContent=claims.size+' ⭐';
+}}
+function celebrate(button){{
+  const box=button.getBoundingClientRect();
+  for(let index=0;index<14;index++){{
+    const spark=document.createElement('span');spark.className='spark';spark.textContent=index%3===0?'⭐':'✨';
+    spark.style.left=(box.left+box.width/2)+'px';spark.style.top=(box.top+box.height/2)+'px';
+    spark.style.setProperty('--x',((Math.random()-.5)*240)+'px');spark.style.setProperty('--y',(-45-Math.random()*150)+'px');spark.style.setProperty('--r',((Math.random()-.5)*240)+'deg');
+    document.body.appendChild(spark);setTimeout(()=>spark.remove(),900);
+  }}
+}}
+document.querySelectorAll('[data-reward]').forEach(button=>button.addEventListener('click',()=>{{
+  const code=button.dataset.reward;if(claims.has(code))return;
+  claims.add(code);try{{localStorage.setItem(storageKey,JSON.stringify([...claims]))}}catch(error){{}}updateRewards();celebrate(button);showToast('{esc(ui['claimed'])} · +1 ⭐');
+}}));
+function rememberView(){{
+  const open=[...document.querySelectorAll('.node details[open]')].map(item=>item.closest('.node').dataset.code);
+  try{{sessionStorage.setItem(viewKey,JSON.stringify({{scrollY,activeFilter,open,time:Date.now()}}))}}catch(error){{}}
+}}
+function restoreView(){{
+  try{{const view=JSON.parse(sessionStorage.getItem(viewKey)||'null');if(!view||Date.now()-view.time>60000)return;applyFilter(view.activeFilter||'all');(view.open||[]).forEach(code=>document.querySelector('[data-code="'+code+'"] details')?.setAttribute('open',''));requestAnimationFrame(()=>scrollTo(0,view.scrollY||0))}}catch(error){{}}
+}}
+window.addEventListener('beforeunload',rememberView);restoreView();updateRewards();
+setInterval(async()=>{{
+  if(document.visibilityState!=='visible')return;
+  rememberView();
+  if(location.protocol==='file:'){{location.reload();return}}
+  try{{const response=await fetch(location.href.split('#')[0]+'?map-check='+Date.now(),{{cache:'no-store'}});const source=await response.text();const match=source.match(/name="onboarding-build" content="([^"]+)"/);if(match&&match[1]!==buildId)location.reload()}}catch(error){{}}
+}},10000);
 </script>
 </body>
 </html>"""
@@ -307,6 +417,7 @@ def main() -> int:
     parser.add_argument("state", type=Path, help="Path to state.json")
     parser.add_argument("--output", type=Path, help="HTML output path")
     parser.add_argument("--check", action="store_true", help="Validate without rendering")
+    parser.add_argument("--open", action="store_true", help="Open the rendered map in the default browser")
     args = parser.parse_args()
 
     try:
@@ -318,6 +429,8 @@ def main() -> int:
         output = args.output or args.state.with_name("map.html")
         output.write_text(render(state), encoding="utf-8")
         print(f"Rendered onboarding map: {output}")
+        if args.open and not webbrowser.open(output.resolve().as_uri(), new=2):
+            print(f"Warning: could not open the browser; open this file: {output}", file=sys.stderr)
         return 0
     except (OSError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)

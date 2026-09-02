@@ -1,0 +1,25 @@
+{
+  "id": "django-modern-rest-1225",
+  "repository": "https://github.com/wemake-services/django-modern-rest.git",
+  "base_commit": "ea7d1d008383de9c976cf4db4b2a67934a7fe320",
+  "issue_file": "issue.md",
+  "accepted_pull_request": "https://github.com/wemake-services/django-modern-rest/pull/1227",
+  "setup_commands": [
+    ["uv", "sync", "--group", "unit-test", "--all-extras"]
+  ],
+  "oracle_file": "oracle_test.py",
+  "oracle_target": "tests/test_integration/test_management/test_onboarding_oracle.py",
+  "oracle_commands": [
+    [
+      "uv",
+      "run",
+      "python",
+      "-m",
+      "pytest",
+      "-o",
+      "addopts=",
+      "tests/test_integration/test_management/test_dmr_export_schema.py",
+      "tests/test_integration/test_management/test_onboarding_oracle.py"
+    ]
+  ]
+}

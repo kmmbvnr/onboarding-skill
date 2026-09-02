@@ -11,12 +11,12 @@ Use `.onboarding-demo/state.json`. Do not use `.onboarding/state.json` for the t
 If tour state does not exist, run:
 
 ```bash
-python3 <skill-directory>/scripts/create_tour.py --language <ru|en> --output-dir .onboarding-demo
+python3 <skill-directory>/scripts/create_tour.py --language <ru|en> --output-dir .onboarding-demo --open
 ```
 
 For another user language, create the English state, translate display text and labels, then render it again. Keep codenames and JSON enum values unchanged.
 
-Add `.onboarding-demo/` to `.git/info/exclude` when the directory is inside a Git project. Show the map path. Then start `TOUR-START` without another question.
+Add `.onboarding-demo/` to `.git/info/exclude` when the directory is inside a Git project. Open the map without waiting for the user to ask. Then start `TOUR-START` without another question.
 
 If tour state exists, continue its active, revisit, or next ready node.
 

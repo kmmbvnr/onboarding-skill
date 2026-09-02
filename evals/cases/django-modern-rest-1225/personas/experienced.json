@@ -1,0 +1,21 @@
+{
+  "id": "experienced",
+  "role": "Experienced Python developer who is new to this Django package",
+  "known": [
+    "Python, pytest, argparse-style interfaces, and Git",
+    "Django request handling and management commands",
+    "test doubles, monkeypatching, and release notes"
+  ],
+  "partial": [
+    "understands OpenAPI but has not used django-modern-rest"
+  ],
+  "unknown": [
+    "this repository's architecture and local contribution conventions"
+  ],
+  "behavior": [
+    "Place out of basic topics with concise evidence.",
+    "Read nearby code before asking a question.",
+    "Ask only about project-specific ambiguity.",
+    "Reject repeated explanations after demonstrating the skill."
+  ]
+}

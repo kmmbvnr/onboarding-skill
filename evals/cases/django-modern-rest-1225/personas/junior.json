@@ -1,0 +1,23 @@
+{
+  "id": "junior",
+  "role": "Junior Django developer with six months of project experience",
+  "known": [
+    "Python typing and pytest basics",
+    "Django views, models, and manage.py commands",
+    "Git branches, diffs, and focused test runs"
+  ],
+  "partial": [
+    "has read custom management commands but has not written one",
+    "has used monkeypatch once"
+  ],
+  "unknown": [
+    "django-modern-rest architecture",
+    "this repository's contribution and changelog rules"
+  ],
+  "behavior": [
+    "Infer ordinary Python and Django details without asking for a lecture.",
+    "Ask when a project-specific convention is unclear.",
+    "Skip a topic only after giving evidence that you know it.",
+    "Run focused checks before declaring the issue complete."
+  ]
+}

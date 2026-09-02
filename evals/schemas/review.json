@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "outcome": {"type": "string", "enum": ["pass", "fail", "blocked"]},
+    "summary": {"type": "string"},
+    "useful_nodes": {"type": "array", "items": {"type": "string"}},
+    "redundant_nodes": {"type": "array", "items": {"type": "string"}},
+    "missing_topics": {"type": "array", "items": {"type": "string"}},
+    "answer_leaks": {"type": "array", "items": {"type": "string"}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+          "evidence": {"type": "string"},
+          "proposed_change": {"type": "string"}
+        },
+        "required": ["severity", "evidence", "proposed_change"],
+        "additionalProperties": false
+      }
+    },
+    "proposed_skill_change": {"type": "string"}
+  },
+  "required": [
+    "outcome",
+    "summary",
+    "useful_nodes",
+    "redundant_nodes",
+    "missing_topics",
+    "answer_leaks",
+    "findings",
+    "proposed_skill_change"
+  ],
+  "additionalProperties": false
+}

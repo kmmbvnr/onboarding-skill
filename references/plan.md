@@ -12,12 +12,23 @@ Ask for:
 - the optional onboarding message from the supervisor to the learner.
 
 Do not ask for a complete skill inventory.
+Ask at most three short questions in one message. Combine related items.
+Do not infer the answers from the issue or the repository. Wait for the learner's
+reply before you inspect the project or create state.
 
 ## 2. Inspect the project
 
-Read project instructions and the main documentation. Detect the stack, start commands, tests, contribution flow, delivery clues, and one representative product flow. Use recent history when it is available. Do not read the repository from top to bottom.
+Read project instructions, the main documentation, and files close to the
+learner's goal. Detect the stack, start commands, tests, contribution flow,
+delivery clues, and one representative product flow. Use recent history when it
+is available. Do not read the repository from top to bottom. Stop when you have
+enough evidence to build the route.
 
-Inspect the project's logo, color tokens, styles, and owned images. Use them to define the map theme. Prefer an existing project asset when it helps explain a node. Do not copy art from an unrelated product. Use a neutral theme when the project has no visual system.
+Inspect the names and metadata of project-owned visual assets first. Read at
+most one small token or style file. Do not dump a large SVG or image as text.
+Use the evidence to define the map theme. Prefer an existing project asset when
+it helps explain a node. Do not copy art from an unrelated product. Use a
+neutral theme when the project has no visual system.
 
 Separate evidence from inference. Record unknown company facts as unknown.
 
@@ -26,20 +37,26 @@ Separate evidence from inference. Record unknown company facts as unknown.
 Use two to four short checks when a missing prerequisite can block an early node. Ask the learner to explain, trace, predict, or run something. Do not use trivia.
 
 An experienced learner can place out of a node with clear evidence. A beginner must get an early, low-risk win before a long trace.
+Do not add a node for a tool basic or policy restatement when intake evidence
+already shows that the learner can apply it to the goal.
 
 ## 4. Build the route
 
-Create 7 to 15 nodes. Each node must produce one observable result. Use short codenames such as `FIRST-LIGHT`, `REQUEST-RIVER`, or `SAFE-HARBOR`.
+Create 5 to 9 nodes for the first chapter. Add later chapters after the learner
+completes a real task. Each node must produce one observable result in 5 to 20
+minutes. The hard limit is 25 minutes. Split longer work into checkpoints. Use
+short codenames such as `FIRST-LIGHT`, `REQUEST-RIVER`, or `SAFE-HARBOR`.
 
 Prefer this route:
 
-1. product purpose;
-2. local start and checks;
-3. one vertical system flow;
-4. contribution and review loop;
-5. delivery and observation;
-6. a low-risk real task;
-7. scoped ownership.
+1. a small visible win;
+2. only the goal-specific prerequisite or trace;
+3. a low-risk real change;
+4. its focused test and review;
+5. the next useful branch.
+
+Put the first useful change in the first three nodes. Do not make the learner
+finish a repository tour before the first change.
 
 Add branches only when the role needs them. If a required library or technology is missing, add a small lab under `.onboarding/labs/<codename>/`. The lab must teach the idiomatic basics before the learner studies project-specific use.
 
@@ -47,7 +64,14 @@ Do not add a broad topic such as "Learn Django." State the next action instead.
 
 ## 5. Save and show
 
-Create `.onboarding/state.json` as defined in [state.md](state.md). Add `.onboarding/` to `.git/info/exclude` when possible. Render `.onboarding/map.html`.
+Create `.onboarding/state.json` as defined in [state.md](state.md). Add `.onboarding/` to `.git/info/exclude` when possible. Render and open the first map:
+
+```bash
+python3 <skill-directory>/scripts/render_map.py .onboarding/state.json --open
+```
+
+Do not wait for the user to ask you to open it. If the runtime blocks browser
+launch, give the exact map path. Later renders refresh the open page.
 
 Report:
 

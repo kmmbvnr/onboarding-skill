@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import webbrowser
 from pathlib import Path
 
 from render_map import render, validate
@@ -126,6 +127,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--language", choices=sorted(TEXT), default="en")
     parser.add_argument("--output-dir", type=Path, default=Path(".onboarding-demo"))
+    parser.add_argument("--open", action="store_true", help="Open the map in the default browser")
     args = parser.parse_args()
 
     output_dir = args.output_dir.resolve()
@@ -137,6 +139,8 @@ def main() -> int:
         validate(state)
         map_path.write_text(render(state), encoding="utf-8")
         print(f"Tour already exists. Rendered map: {map_path}")
+        if args.open:
+            webbrowser.open(map_path.resolve().as_uri(), new=2)
         return 0
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -145,6 +149,8 @@ def main() -> int:
     state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     map_path.write_text(render(state), encoding="utf-8")
     print(f"Created onboarding tour: {map_path}")
+    if args.open:
+        webbrowser.open(map_path.resolve().as_uri(), new=2)
     return 0
 
 

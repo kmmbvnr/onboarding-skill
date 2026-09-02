@@ -63,6 +63,9 @@ Each node requires:
 }
 ```
 
+`estimated_minutes` must be from 1 to 25. Prefer 5 to 20. Split longer work into
+separate nodes with separate evidence.
+
 Allowed values:
 
 - `kind`: `orientation`, `check`, `setup`, `trace`, `lab`, `task`, `review`.

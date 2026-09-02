@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "reply": {"type": "string"},
+    "status": {"type": "string", "enum": ["continue", "issue_complete", "blocked"]},
+    "evidence": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["reply", "status", "evidence"],
+  "additionalProperties": false
+}
