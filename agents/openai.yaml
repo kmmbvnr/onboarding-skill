@@ -1,0 +1,4 @@
+interface:
+  display_name: "Developer Onboarding"
+  short_description: "Plan and run onboarding in a real project"
+  default_prompt: "Use $onboarding to plan my path through this project."
