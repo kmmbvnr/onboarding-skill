@@ -1,5 +1,18 @@
 # Eval-driven changes
 
+## 2026-09-02 — access readiness does not freeze the route
+
+- Source: product-owner clarification after the Together trial.
+- Requirement: onboarding must prove that required local commands work and
+  role-relevant systems are accessible.
+- Change: check near-term local capabilities, request long-lead access early,
+  and link each external blocker to exact node codenames and `waiting_for`.
+- Route rule: while an external action is pending, continue the first useful
+  unblocked node. Mark the whole environment blocked only when no useful branch
+  remains.
+- Validation: seven state and renderer tests pass. Current Together state remains
+  valid and unchanged. Skill validation passes.
+
 ## 2026-09-02 — failed command is evidence, not a skip
 
 - Source: human review of the Together onboarding trial.

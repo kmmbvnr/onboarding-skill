@@ -115,6 +115,7 @@ def validate(state: dict) -> None:
         if not isinstance(learner.get(field), list):
             fail(f"learner.{field} must be an array")
 
+    blocked_node_refs: list[tuple[str, str]] = []
     environment = state.get("environment")
     if environment is not None:
         if not isinstance(environment, dict):
@@ -136,9 +137,14 @@ def validate(state: dict) -> None:
         blocker_ids: set[str] = set()
         for index, blocker in enumerate(blockers):
             label = f"environment.blockers[{index}]"
-            expected_blocker = {"id", "scope", "summary", "evidence", "next_action"}
-            if not isinstance(blocker, dict) or set(blocker) != expected_blocker:
-                fail(f"{label} must contain only: {sorted(expected_blocker)}")
+            required_blocker = {"id", "scope", "summary", "evidence", "next_action"}
+            optional_blocker = {"waiting_for", "blocks"}
+            if not isinstance(blocker, dict):
+                fail(f"{label} must be an object")
+            missing = required_blocker - set(blocker)
+            extra = set(blocker) - required_blocker - optional_blocker
+            if missing or extra:
+                fail(f"{label} keys are invalid; missing={sorted(missing)}, extra={sorted(extra)}")
             blocker_id = require_text(blocker.get("id"), f"{label}.id")
             if not CODENAME.fullmatch(blocker_id):
                 fail(f"{label}.id must use uppercase words and hyphens")
@@ -149,6 +155,19 @@ def validate(state: dict) -> None:
                 fail(f"{label}.scope is invalid")
             for field in ("summary", "evidence", "next_action"):
                 require_text(blocker.get(field), f"{label}.{field}")
+            has_waiting_for = "waiting_for" in blocker
+            has_blocks = "blocks" in blocker
+            if has_waiting_for != has_blocks:
+                fail(f"{label} must contain both waiting_for and blocks")
+            if has_waiting_for:
+                require_text(blocker.get("waiting_for"), f"{label}.waiting_for")
+                blocked = blocker.get("blocks")
+                if not isinstance(blocked, list) or not blocked:
+                    fail(f"{label}.blocks must be a non-empty array")
+                for code in blocked:
+                    if not isinstance(code, str) or not CODENAME.fullmatch(code):
+                        fail(f"{label}.blocks must contain node codenames")
+                    blocked_node_refs.append((blocker_id, code))
         if environment["status"] == "ready" and blockers:
             fail("environment.status ready cannot have blockers")
         if environment["status"] in {"partial", "blocked"} and not blockers:
@@ -219,6 +238,24 @@ def validate(state: dict) -> None:
     if len(active) > 1:
         fail(f"Only one node can be active: {active}")
     status_by_code = {node["codename"]: node["status"] for node in nodes}
+    blocked_codes = {code for _, code in blocked_node_refs}
+    for blocker_id, code in blocked_node_refs:
+        if code not in seen:
+            fail(f"Environment blocker {blocker_id} blocks unknown codename: {code}")
+        if status_by_code[code] in {"ready", "active"}:
+            fail(f"Environment blocker {blocker_id} blocks {code}, but the node is {status_by_code[code]}")
+
+    if environment is not None and environment["status"] in {"partial", "blocked"}:
+        available = {
+            code
+            for code, status in status_by_code.items()
+            if status in {"ready", "active", "revisit"} and code not in blocked_codes
+        }
+        if environment["status"] == "partial" and not available:
+            fail("environment.status partial requires an unblocked available node")
+        if environment["status"] == "blocked" and available:
+            fail(f"environment.status blocked has unblocked available nodes: {sorted(available)}")
+
     for node in nodes:
         if node["status"] in {"ready", "active"}:
             blocked = [

@@ -60,13 +60,19 @@ Each blocker requires:
   "scope": "project",
   "summary": "The documented test command cannot create its database.",
   "evidence": "The command exited before tests ran because migration 0036 uses ArrayField on SQLite.",
-  "next_action": "Run the supported PostgreSQL test path or clarify SQLite support."
+  "next_action": "Run the supported PostgreSQL test path or clarify SQLite support.",
+  "waiting_for": "Project owner decision",
+  "blocks": ["FIRST-PATCH"]
 }
 ```
 
 Allowed blocker scopes are `machine`, `service`, `access`, `project`, and
 `unknown`. Store tool versions and successful checks in `working`. Do not store
 tokens, environment values, or other secrets.
+
+`waiting_for` names the person, team, or learner action that can resolve the
+blocker. `blocks` contains only node codenames that cannot continue. Other ready
+nodes stay available. Remove a blocker after a new check proves it resolved.
 
 Each node requires:
 

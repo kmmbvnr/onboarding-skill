@@ -10,6 +10,9 @@ Ask the learner to confirm two facts before you write:
 - Did any completed work or evidence occur outside the recorded sessions?
 
 Do not include secrets, private feedback, raw quiz errors, or unsupported claims. Use `environment.blockers` when it exists. Separate machine, service, access, and project blockers from learning gaps. Use the learner's language and ASD-STE100 principles.
+For each open blocker, name `waiting_for`, the blocked codenames, and the next
+action. Do not report the whole onboarding as blocked while another useful node
+is available.
 
 ## Daily report
 

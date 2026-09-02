@@ -4,12 +4,23 @@ Use this guide after intake and whenever a project command cannot run or fails.
 
 ## Establish a baseline
 
-Choose two to five checks from project files. Prefer:
+Build a finite readiness list from the learner's role and route. One check can
+prove a category; do not test every similar command. Check every local category
+needed for the first chapter:
 
 - required runtime and package-manager versions;
 - the supported dependency or environment command;
 - one required local service, such as a database or queue;
 - one focused test, build, or start command near the learner's goal.
+
+Also identify external systems needed for normal work. Check only role-relevant
+access, such as source hosting, issue tracking, CI, staging, logs, a secret
+manager, or deployment. Verify access with a read-only operation or the
+learner's direct confirmation. Do not create records, push dummy changes, or
+deploy only to test access.
+
+Request later access early when approval can take time. Do not delay the first
+chapter while access for a later chapter is pending.
 
 Ask the learner to run one check at a time. Do not request secrets. Do not
 install software, start shared services, or change project configuration unless
@@ -17,6 +28,10 @@ the user asks.
 
 Record successful facts in `environment.working`. Record a blocker only when it
 changes the safe next action.
+
+Do not set environment status to `ready` while a role-required local capability
+or external access is unverified. Record an unverified requirement as an
+`unknown` blocker and link it to the nodes that will need it.
 
 ## Classify a blocker
 
@@ -27,6 +42,10 @@ changes the safe next action.
 - `unknown`: the evidence is not sufficient yet.
 
 Do not label an environment blocker as a learner knowledge gap.
+
+For each blocker, set `waiting_for` to the person, team, or learner action that
+can resolve it. Set `blocks` to the exact node codenames that cannot continue.
+Do not use a global blocker when only one branch is affected.
 
 ## Interpret a failed command
 
@@ -51,5 +70,11 @@ Set environment status to:
 - `blocked` when no safe project action can continue;
 - `unknown` before the baseline is complete.
 
-Keep independent nodes ready. Use a small lab when a missing local dependency
-blocks project work but the learner can still practice the required concept.
+Keep independent nodes ready. Do not repeatedly select a node that waits for an
+external action. Continue with a ready node whose codename is not in any
+blocker's `blocks` list.
+
+Use a small lab when a missing local dependency blocks project work but the
+learner can still practice the required concept. Recheck a blocker when the
+learner says the external action is complete. Remove it only after evidence
+shows that the required access or command now works.

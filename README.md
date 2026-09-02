@@ -40,6 +40,10 @@ The first chapter also records a small local-environment baseline. A failed
 command can still complete a diagnostic node; machine and project blockers are
 tracked separately from learner progress.
 
+The baseline covers local commands and role-relevant external access. A pending
+access request blocks only the nodes that need it. The learner continues on an
+independent branch while another person or team completes the request.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

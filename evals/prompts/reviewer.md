@@ -20,6 +20,8 @@ Use these definitions:
   contract asks for the run and the observed cause.
 - Using `skipped` for a failed command is an onboarding error. The coach must
   separate learner evidence from machine, service, access, or project blockers.
+- An external blocker must name the affected nodes. It must not freeze an
+  independent branch or be selected again while the external action is pending.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

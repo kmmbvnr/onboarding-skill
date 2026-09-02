@@ -9,9 +9,18 @@ unfinished node longer than 25 minutes, split that node into short checkpoints.
 Preserve completed nodes, session evidence, and claimed capability. Render the
 migrated map before the lesson.
 
-Select the requested codename. If there is no codename, select the `active` node, then the first `revisit` node, then the first `ready` node. A node is ready only when all required nodes are `done` or `skipped`.
+Build the set of waiting codenames from `environment.blockers[].blocks`. Do not
+select one of those nodes while its blocker is open.
 
-If there is no project state, route to `plan`. If there is no tour state, route to `tour`. If the requested node is locked, explain the missing prerequisite and offer the nearest ready node.
+Select the requested codename. If there is no codename, select the first
+unblocked `active` node, then the first unblocked `revisit` node, then the first
+unblocked `ready` node. A node is ready only when all required nodes are `done`
+or `skipped`.
+
+If there is no project state, route to `plan`. If there is no tour state, route
+to `tour`. If the requested node is locked or waits for an external action,
+explain the specific prerequisite or blocker and offer the nearest unblocked
+node.
 
 ## Teach
 
@@ -43,7 +52,12 @@ Use `revisit` when the learner needs more knowledge or practice. Use a
 or project prevents the required result. Use `skipped` only when prior evidence
 makes the node unnecessary. Never use `skipped` for a failed command.
 
-Append a short session record. Include the date, result, evidence, and one remaining gap. Set newly unlocked nodes to `ready`. Render the map again. Do not open a new browser tab. The existing map refreshes itself.
+When an external blocker appears, set an attempted node to `revisit` or an
+unstarted node to `locked`. Record who or what resolves it and the exact blocked
+codenames. Then continue an independent node. Set environment status to
+`blocked` only when no useful unblocked node remains.
+
+Append a short session record. Include the date, result, evidence, and one remaining gap. Set newly unlocked and unblocked nodes to `ready`. Render the map again. Do not open a new browser tab. The existing map refreshes itself.
 
 The page shows a reward button only after the node status is `done`. The learner
 claims the reward in the browser. Do not mark a node `done` to expose the button;

@@ -34,9 +34,11 @@ Separate evidence from inference. Record unknown company facts as unknown.
 
 ## 3. Check the local environment
 
-Use [environment.md](environment.md). Select two to five checks from project
-evidence. Ask the learner to run them one at a time. Record what works and what
-blocks progress. Do not turn a tool or project failure into a learner failure.
+Use [environment.md](environment.md). Check each local capability needed for the
+first chapter. Identify all role-relevant external access and request
+long-lead access before it blocks a later chapter. Ask the learner to run checks
+one at a time. Record what works and what blocks progress. Do not turn a tool or
+project failure into a learner failure.
 
 If the environment is not fully ready, keep an independent safe branch open.
 Do not lock the whole map when the learner can still inspect, trace, or use a
@@ -69,6 +71,10 @@ Put the first useful change in the first three nodes. Do not make the learner
 finish a repository tour before the first change.
 
 Add branches only when the role needs them. If a required library or technology is missing, add a small lab under `.onboarding/labs/<codename>/`. The lab must teach the idiomatic basics before the learner studies project-specific use.
+
+Avoid one fully linear chain when an access request can take time. Link each
+open blocker only to the nodes it prevents. Keep at least one useful independent
+node ready when project evidence allows it.
 
 Do not add a broad topic such as "Learn Django." State the next action instead.
 

@@ -46,6 +46,8 @@ class RenderMapTests(unittest.TestCase):
                     "summary": "The focused test cannot create its database.",
                     "evidence": "The migration failed before tests ran.",
                     "next_action": "Use the documented PostgreSQL test path.",
+                    "waiting_for": "Project owner",
+                    "blocks": ["TOUR-LEAD"],
                 }
             ],
         }
@@ -70,11 +72,80 @@ class RenderMapTests(unittest.TestCase):
                     "summary": "A required tool is missing.",
                     "evidence": "The version command was not found.",
                     "next_action": "Install the supported tool version.",
+                    "waiting_for": "Learner",
+                    "blocks": ["TOUR-LEAD"],
                 }
             ],
         }
 
         with self.assertRaisesRegex(ValueError, "ready cannot have blockers"):
+            validate(state)
+
+    def test_blocker_cannot_reference_unknown_node(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["environment"] = {
+            "checked_at": "2026-09-02",
+            "status": "partial",
+            "working": ["Python works"],
+            "blockers": [
+                {
+                    "id": "STAGING-ACCESS",
+                    "scope": "access",
+                    "summary": "Staging access is pending.",
+                    "evidence": "The access request is open.",
+                    "next_action": "Wait for platform team approval.",
+                    "waiting_for": "Platform team",
+                    "blocks": ["UNKNOWN-NODE"],
+                }
+            ],
+        }
+
+        with self.assertRaisesRegex(ValueError, "blocks unknown codename"):
+            validate(state)
+
+    def test_partial_environment_requires_an_unblocked_next_node(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["status"] = "revisit"
+        state["environment"] = {
+            "checked_at": "2026-09-02",
+            "status": "partial",
+            "working": [],
+            "blockers": [
+                {
+                    "id": "LOCAL-SERVICE",
+                    "scope": "service",
+                    "summary": "The required database is unavailable.",
+                    "evidence": "The supported health check failed.",
+                    "next_action": "Start the approved local database.",
+                    "waiting_for": "Learner",
+                    "blocks": ["TOUR-START"],
+                }
+            ],
+        }
+
+        with self.assertRaisesRegex(ValueError, "requires an unblocked available node"):
+            validate(state)
+
+    def test_blocked_environment_rejects_an_unblocked_next_node(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["environment"] = {
+            "checked_at": "2026-09-02",
+            "status": "blocked",
+            "working": [],
+            "blockers": [
+                {
+                    "id": "LATER-ACCESS",
+                    "scope": "access",
+                    "summary": "Access for a later node is pending.",
+                    "evidence": "The access request is open.",
+                    "next_action": "Wait for approval.",
+                    "waiting_for": "Platform team",
+                    "blocks": ["TOUR-LEAD"],
+                }
+            ],
+        }
+
+        with self.assertRaisesRegex(ValueError, "has unblocked available nodes"):
             validate(state)
 
 
