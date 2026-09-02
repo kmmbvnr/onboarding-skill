@@ -13,11 +13,17 @@ needed for the first chapter:
 - one required local service, such as a database or queue;
 - one focused test, build, or start command near the learner's goal.
 
-Also identify external systems needed for normal work. Check only role-relevant
-access, such as source hosting, issue tracking, CI, staging, logs, a secret
-manager, or deployment. Verify access with a read-only operation or the
-learner's direct confirmation. Do not create records, push dummy changes, or
-deploy only to test access.
+Also identify external systems needed for normal work. Derive each system from
+repository evidence, such as Git remotes, CI workflows, deployment files,
+project documentation, and example environment variable names. Check only
+role-relevant access.
+
+Do not bundle source hosting, CI, staging, logs, chat, or deployment into one
+yes-or-no question. For each unknown system, name the system, cite the evidence
+path, explain which task needs it, and request one safe read-only check. Accept
+"I do not know" and keep the requirement `unknown`. A bare yes is not enough to
+prove critical access. Do not create records, push dummy changes, send test
+messages, or deploy only to test access.
 
 Request later access early when approval can take time. Do not delay the first
 chapter while access for a later chapter is pending.

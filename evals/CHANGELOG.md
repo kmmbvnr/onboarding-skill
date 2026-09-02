@@ -1,5 +1,19 @@
 # Eval-driven changes
 
+## 2026-09-02 — full route and repository-derived assessment
+
+- Source: human review of a generated project plan.
+- Evidence: the map stopped after seven nodes. Intake grouped GitHub, CI,
+  staging, logs, and chat into one yes-or-no question. It also grouped four
+  technologies into one broad self-rating.
+- Change: show 3–5 chapters and normally 12–24 evidence-based nodes. Keep only
+  the nearest 5–9 nodes detailed. Derive access checks from repository paths and
+  use two to four small capability checks for the first task. Treat theory-only
+  experience as a practical gap and add a short example-to-project bridge. Do
+  not invent a product change when no approved work item exists.
+- Validation: nine state and renderer tests pass. Current Together state remains
+  valid and unchanged. Skill validation passes.
+
 ## 2026-09-02 — access readiness does not freeze the route
 
 - Source: product-owner clarification after the Together trial.

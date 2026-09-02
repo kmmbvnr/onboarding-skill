@@ -189,6 +189,8 @@ def validate(state: dict) -> None:
             require_text(node.get(field), f"{label}.{field}")
         if not isinstance(node.get("image"), str):
             fail(f"{label}.image must be text")
+        if "chapter" in node:
+            require_text(node.get("chapter"), f"{label}.chapter")
         code = node["codename"]
         if not CODENAME.fullmatch(code):
             fail(f"{label}.codename must use uppercase words and hyphens")
@@ -382,6 +384,20 @@ def render_node(node: dict, index: int, labels: dict, ui: dict) -> str:
     </article>"""
 
 
+def render_nodes(nodes: list[dict], labels: dict, ui: dict) -> str:
+    output: list[str] = []
+    previous_chapter: str | None = None
+    for index, node in enumerate(nodes):
+        chapter = node.get("chapter")
+        if chapter and chapter != previous_chapter:
+            output.append(
+                f'<section class="chapter-marker"><span>{esc(chapter)}</span></section>'
+            )
+        output.append(render_node(node, index, labels, ui))
+        previous_chapter = chapter
+    return "\n".join(output)
+
+
 def render(state: dict) -> str:
     project = state["project"]
     learner = state["learner"]
@@ -413,9 +429,7 @@ def render(state: dict) -> str:
     ).hexdigest()[:16]
     project_key = hashlib.sha256(project["root"].encode("utf-8")).hexdigest()[:16]
     path_color = theme["path"].replace("#", "%23")
-    node_html = "\n".join(
-        render_node(node, index, labels, ui) for index, node in enumerate(nodes)
-    )
+    node_html = render_nodes(nodes, labels, ui)
     return f"""<!doctype html>
 <html lang="{esc(state['language'])}">
 <head>
@@ -431,16 +445,17 @@ header{{position:sticky;top:0;z-index:10;padding:12px 18px;background:color-mix(
 .score{{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--paper);border:1px solid rgba(38,50,37,.14);border-radius:16px;box-shadow:0 4px 12px rgba(38,50,37,.08)}} .meter{{min-width:130px;text-align:right;font-weight:850}} progress{{display:block;width:130px;height:9px;accent-color:var(--done)}} #reward-count{{font-size:18px;font-weight:900;white-space:nowrap}}
 .filters{{max-width:920px;margin:9px auto 0;display:flex;gap:6px;overflow:auto}} .filters button{{white-space:nowrap}} .live{{margin-left:auto;color:var(--muted);font-size:12px;align-self:center;white-space:nowrap}}
 main{{position:relative;max-width:920px;margin:auto;padding:30px 18px 100px;overflow:hidden}} .trail{{position:absolute;z-index:0;left:50%;top:0;bottom:0;width:150px;transform:translateX(-50%);background-size:150px 360px;background-repeat:repeat-y;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 360'%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='{path_color}' stroke-width='58' stroke-linecap='round'/%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='%23ffffff' stroke-opacity='.58' stroke-width='3' stroke-dasharray='7 12'/%3E%3C/svg%3E");filter:drop-shadow(0 3px 0 rgba(38,50,37,.12))}}
-.node{{position:relative;z-index:1;display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;min-height:178px}} .node:nth-child(odd) .card{{grid-column:1}} .node:nth-child(even) .card{{grid-column:3}} .node .badge{{grid-column:2}}
-.badge{{grid-row:1;z-index:2;justify-self:center;display:grid;place-items:center;width:62px;height:62px;font-size:28px;background:var(--paper);border:4px solid var(--ready);border-radius:50%;box-shadow:0 6px 0 rgba(38,50,37,.18),0 10px 22px rgba(38,50,37,.12)}} .node:nth-child(4n+1) .badge{{transform:translateX(-30px)}} .node:nth-child(4n+2) .badge{{transform:translateX(24px)}} .node:nth-child(4n+3) .badge{{transform:translateX(38px)}}
+.chapter-marker{{position:relative;z-index:2;display:flex;justify-content:center;margin:22px 0 8px}} .chapter-marker span{{padding:7px 14px;border:2px solid color-mix(in srgb,var(--ink) 22%,transparent);border-radius:999px;background:var(--paper);box-shadow:0 4px 0 rgba(38,50,37,.12);font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}}
+.node{{position:relative;z-index:1;display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;min-height:178px}} .node:nth-of-type(odd) .card{{grid-column:1}} .node:nth-of-type(even) .card{{grid-column:3}} .node .badge{{grid-column:2}}
+.badge{{grid-row:1;z-index:2;justify-self:center;display:grid;place-items:center;width:62px;height:62px;font-size:28px;background:var(--paper);border:4px solid var(--ready);border-radius:50%;box-shadow:0 6px 0 rgba(38,50,37,.18),0 10px 22px rgba(38,50,37,.12)}} .node:nth-of-type(4n+1) .badge{{transform:translateX(-30px)}} .node:nth-of-type(4n+2) .badge{{transform:translateX(24px)}} .node:nth-of-type(4n+3) .badge{{transform:translateX(38px)}}
 .step{{position:absolute;left:calc(50% + 38px);top:52px;z-index:3;background:var(--ink);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}}
-.card{{grid-row:1;background:color-mix(in srgb,var(--paper) 94%,white);border:1px solid rgba(38,50,37,.16);border-radius:18px;padding:14px;box-shadow:0 6px 0 rgba(38,50,37,.12),0 12px 30px rgba(38,50,37,.08);max-width:330px}} .node:nth-child(odd) .card{{justify-self:end}} .node:nth-child(even) .card{{justify-self:start}}
+.card{{grid-row:1;background:color-mix(in srgb,var(--paper) 94%,white);border:1px solid rgba(38,50,37,.16);border-radius:18px;padding:14px;box-shadow:0 6px 0 rgba(38,50,37,.12),0 12px 30px rgba(38,50,37,.08);max-width:330px}} .node:nth-of-type(odd) .card{{justify-self:end}} .node:nth-of-type(even) .card{{justify-self:start}}
 .node-image{{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:10px}} .meta{{display:flex;gap:6px;flex-wrap:wrap}} .meta span,.codename{{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}} .meta span{{padding:3px 7px;background:rgba(255,255,255,.72);border-radius:999px}} .status-pill{{color:var(--active)}} .codename{{color:var(--active);margin:9px 0 2px}} h2{{font-size:19px;line-height:1.12;margin:0 0 5px}} p{{margin:5px 0}} details{{margin-top:8px}} summary{{cursor:pointer;font-weight:800}} dl{{display:grid;grid-template-columns:70px 1fr;gap:5px;margin:8px 0}} dt{{font-weight:800}} dd{{margin:0}} .paths{{display:flex;gap:5px;flex-wrap:wrap}} code{{background:#eef0e3;border-radius:5px;padding:2px 5px;font-size:11px}}
 button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;padding:7px 10px;cursor:pointer;font-weight:800}} button:focus-visible{{outline:3px solid var(--active);outline-offset:2px}} .card>button{{width:100%;margin-top:9px;background:var(--ink);color:white}} .card>button:disabled{{cursor:not-allowed;background:var(--locked)}} .card>.reward{{background:linear-gradient(135deg,#ffd85a,#ff9d45);color:#3d2600;border-color:#e28d20;box-shadow:0 4px 0 #c87516}} .card>.reward.claimed{{background:var(--done);color:#fff;border-color:var(--done);box-shadow:none}} .terminal-status{{font-weight:800;color:var(--muted)}}
 .done .badge{{border-color:var(--done)}} .active .badge{{border-color:var(--active);animation:pulse 1.6s infinite}} .revisit .badge{{border-color:var(--revisit)}} .locked{{opacity:.58}} .skipped{{opacity:.65}} .hidden{{display:none}} .toast{{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 14px;background:var(--ink);color:white;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.2s}} .toast.show{{opacity:1;transform:translate(-50%,-6px)}} .spark{{position:fixed;z-index:40;pointer-events:none;font-size:22px;animation:burst .85s ease-out forwards}}
 @keyframes pulse{{50%{{scale:1.08}}}} @keyframes burst{{to{{translate:var(--x) var(--y);rotate:var(--r);opacity:0;scale:.5}}}}
 .legend{{max-width:920px;margin:auto;padding:0 20px 36px;color:var(--muted);text-align:center}}
-@media(max-width:700px){{.top{{grid-template-columns:1fr}}.score{{justify-content:space-between}}.meter{{text-align:left}}.live{{display:none}}main{{padding-left:10px}}.trail{{left:49px;width:92px;background-size:92px 280px}}.node{{grid-template-columns:82px 1fr;min-height:166px}}.node .badge,.node:nth-child(odd) .badge,.node:nth-child(even) .badge{{grid-column:1;justify-self:center;transform:none}}.node .card,.node:nth-child(odd) .card,.node:nth-child(even) .card{{grid-column:2;justify-self:stretch;max-width:none}}.step{{left:65px;top:49px}}}}
+@media(max-width:700px){{.top{{grid-template-columns:1fr}}.score{{justify-content:space-between}}.meter{{text-align:left}}.live{{display:none}}main{{padding-left:10px}}.trail{{left:49px;width:92px;background-size:92px 280px}}.node{{grid-template-columns:82px 1fr;min-height:166px}}.node .badge,.node:nth-of-type(odd) .badge,.node:nth-of-type(even) .badge{{grid-column:1;justify-self:center;transform:none}}.node .card,.node:nth-of-type(odd) .card,.node:nth-of-type(even) .card{{grid-column:2;justify-self:stretch;max-width:none}}.step{{left:65px;top:49px}}}}
 @media(prefers-reduced-motion:reduce){{*{{scroll-behavior:auto!important;animation:none!important;transition:none!important}}}} @media print{{header{{position:static}}.filters,.card>button,.trail{{display:none}}body{{background:#fff}}.node{{break-inside:avoid}}}}
 </style>
 </head>

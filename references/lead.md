@@ -11,7 +11,8 @@ Ask the supervisor only for information that the repository cannot provide:
 3. Which system areas will the developer own or change?
 4. Which areas are unsafe or out of scope?
 5. Who can answer product, code, and delivery questions?
-6. Which documents, recent pull requests, or tasks should the developer inspect?
+6. What approved first task or issue should the developer use, if one exists?
+7. Which documents or recent pull requests should the developer inspect?
 
 Ask one or two questions per turn. Stop when the answers are sufficient.
 
@@ -27,6 +28,7 @@ Start with these project areas:
 Do not change these areas yet:
 Ask these people for help:
 Read or inspect:
+Approved first task:
 My advice:
 ```
 

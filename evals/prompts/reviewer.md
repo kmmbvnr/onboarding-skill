@@ -22,6 +22,19 @@ Use these definitions:
   separate learner evidence from machine, service, access, or project blockers.
 - An external blocker must name the affected nodes. It must not freeze an
   independent branch or be selected again while the external action is pending.
+- A grouped access question without repository evidence does not verify access.
+- A grouped technology self-rating does not verify uneven knowledge. Prefer two
+  to four small checks that gate the first task, then assess other libraries
+  when their branch starts.
+- When the learner reports theory without practice in a gating technology,
+  sending them directly to a large project file is a missing bridge. Expect a
+  minimal example and one small practical action first.
+- A product change needs an approved work source: a supervisor task, issue,
+  confirmed bug, agreed failing test, or explicit TODO. "Find an inconsistency
+  and fix it" is a fabricated task. Do not require a product patch when no work
+  item exists.
+- A normal production-project map with fewer than 12 nodes needs repository and
+  role evidence that its scope is genuinely narrow. Do not reward filler nodes.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

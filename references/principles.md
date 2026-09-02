@@ -14,8 +14,12 @@ Use these rules:
 - Check a prerequisite before teaching it. Let experienced people skip it.
 - Give a beginner an easy early win before a complex project path.
 - Keep each node between 5 and 20 minutes. Split work that can exceed 25 minutes.
-- Put a small real change near the start. Expand the map after the learner earns evidence.
+- Put a small real change near the start only when an approved work item exists.
+  Never invent a product change for onboarding. Show the later route, then
+  refine it after the learner earns evidence.
 - Use a small lab outside product code when a required technology is missing.
+- Treat theory without practice as a practical gap. Use a minimal example and
+  one learner change before a large project trace.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.
 - Use a buddy for company context, ownership, and decisions that the repository cannot answer.

@@ -79,6 +79,7 @@ Each node requires:
 ```json
 {
   "codename": "FIRST-LIGHT",
+  "chapter": "Run the project",
   "title": "Start the project",
   "summary": "Run the supported local path and identify each process.",
   "why": "You need a repeatable environment before you change code.",
@@ -93,6 +94,10 @@ Each node requires:
   "project_paths": ["README.md"]
 }
 ```
+
+`chapter` is optional for old state files and self-tours. New project plans set
+it on every node. Use 3 to 5 short chapter names and keep nodes from the same
+chapter adjacent. The map shows a chapter marker when the name changes.
 
 `estimated_minutes` must be from 1 to 25. Prefer 5 to 20. Split longer work into
 separate nodes with separate evidence.

@@ -33,6 +33,26 @@ class RenderMapTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "between 1 and 25"):
             validate(state)
 
+    def test_chapter_markers_are_rendered_when_chapter_changes(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["chapter"] = "First steps"
+        state["nodes"][1]["chapter"] = "First steps"
+        state["nodes"][2]["chapter"] = "Ship safely"
+
+        validate(state)
+        output = render(state)
+
+        self.assertEqual(output.count('class="chapter-marker"'), 2)
+        self.assertIn("First steps", output)
+        self.assertIn("Ship safely", output)
+
+    def test_empty_chapter_is_rejected(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["chapter"] = ""
+
+        with self.assertRaisesRegex(ValueError, "chapter must be non-empty text"):
+            validate(state)
+
     def test_environment_blocker_is_validated_and_rendered(self) -> None:
         state = make_state("en", Path("/project"))
         state["environment"] = {
