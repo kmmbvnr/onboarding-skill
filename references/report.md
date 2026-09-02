@@ -9,7 +9,7 @@ Ask the learner to confirm two facts before you write:
 - Is there a blocker or question that the supervisor must resolve?
 - Did any completed work or evidence occur outside the recorded sessions?
 
-Do not include secrets, private feedback, raw quiz errors, or unsupported claims. Separate project blockers from learning gaps. Use the learner's language and ASD-STE100 principles.
+Do not include secrets, private feedback, raw quiz errors, or unsupported claims. Use `environment.blockers` when it exists. Separate machine, service, access, and project blockers from learning gaps. Use the learner's language and ASD-STE100 principles.
 
 ## Daily report
 

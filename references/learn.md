@@ -27,12 +27,21 @@ Inspect the relevant project files before the lesson. Then use this loop:
 Do not paste the answer before the learner tries. Do not turn the session into a lecture. Use a quiz only when it tests a decision or mental model.
 
 Help the learner start the project and inspect errors. Confirm commands from project files before you suggest them.
+When a command cannot run or fails, use [environment.md](environment.md). Keep
+the command, exit result, and smallest useful error as evidence.
 
 Guide source changes only when the node requires a real low-risk task. The learner makes the change. Do not edit product code unless the learner explicitly asks you to do it.
 
 ## Complete
 
-Mark a node `done` only when the recorded evidence matches its `evidence` field. Use `revisit` when a prerequisite needs more work. Use `skipped` only when current evidence makes the node unnecessary.
+Mark a node `done` only when the recorded evidence matches its `evidence` field.
+A nonzero exit does not prevent `done` when the node goal was to run, observe,
+or diagnose the command. Record the blocker separately.
+
+Use `revisit` when the learner needs more knowledge or practice. Use a
+`stopped` session and an environment blocker when the machine, service, access,
+or project prevents the required result. Use `skipped` only when prior evidence
+makes the node unnecessary. Never use `skipped` for a failed command.
 
 Append a short session record. Include the date, result, evidence, and one remaining gap. Set newly unlocked nodes to `ready`. Render the map again. Do not open a new browser tab. The existing map refreshes itself.
 

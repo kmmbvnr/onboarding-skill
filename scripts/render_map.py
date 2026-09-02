@@ -16,6 +16,8 @@ from pathlib import Path
 KINDS = {"orientation", "check", "setup", "trace", "lab", "task", "review"}
 TARGETS = {"recognize", "operate", "modify"}
 STATUSES = {"locked", "ready", "active", "done", "revisit", "skipped"}
+ENVIRONMENT_STATUSES = {"unknown", "ready", "partial", "blocked"}
+BLOCKER_SCOPES = {"machine", "service", "access", "project", "unknown"}
 CODENAME = re.compile(r"^[A-Z0-9]+(?:-[A-Z0-9]+)*$")
 HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
 LABEL_KEYS = {
@@ -112,6 +114,45 @@ def validate(state: dict) -> None:
     for field in ("experience", "placed_out"):
         if not isinstance(learner.get(field), list):
             fail(f"learner.{field} must be an array")
+
+    environment = state.get("environment")
+    if environment is not None:
+        if not isinstance(environment, dict):
+            fail("environment must be an object")
+        expected = {"checked_at", "status", "working", "blockers"}
+        if set(environment) != expected:
+            fail(f"environment must contain only: {sorted(expected)}")
+        require_text(environment.get("checked_at"), "environment.checked_at")
+        if environment.get("status") not in ENVIRONMENT_STATUSES:
+            fail("environment.status is invalid")
+        working = environment.get("working")
+        if not isinstance(working, list):
+            fail("environment.working must be an array")
+        for index, fact in enumerate(working):
+            require_text(fact, f"environment.working[{index}]")
+        blockers = environment.get("blockers")
+        if not isinstance(blockers, list):
+            fail("environment.blockers must be an array")
+        blocker_ids: set[str] = set()
+        for index, blocker in enumerate(blockers):
+            label = f"environment.blockers[{index}]"
+            expected_blocker = {"id", "scope", "summary", "evidence", "next_action"}
+            if not isinstance(blocker, dict) or set(blocker) != expected_blocker:
+                fail(f"{label} must contain only: {sorted(expected_blocker)}")
+            blocker_id = require_text(blocker.get("id"), f"{label}.id")
+            if not CODENAME.fullmatch(blocker_id):
+                fail(f"{label}.id must use uppercase words and hyphens")
+            if blocker_id in blocker_ids:
+                fail(f"Duplicate environment blocker: {blocker_id}")
+            blocker_ids.add(blocker_id)
+            if blocker.get("scope") not in BLOCKER_SCOPES:
+                fail(f"{label}.scope is invalid")
+            for field in ("summary", "evidence", "next_action"):
+                require_text(blocker.get(field), f"{label}.{field}")
+        if environment["status"] == "ready" and blockers:
+            fail("environment.status ready cannot have blockers")
+        if environment["status"] in {"partial", "blocked"} and not blockers:
+            fail(f"environment.status {environment['status']} requires a blocker")
 
     nodes = state.get("nodes")
     if not isinstance(nodes, list) or not nodes:
@@ -216,6 +257,14 @@ UI_TEXT = {
         "copied": "Copied",
         "rewards": "rewards",
         "live": "Auto-updates",
+        "checks": "Checks passed",
+        "blockers": "Blockers",
+        "environment": {
+            "unknown": "Environment not checked",
+            "ready": "Environment ready",
+            "partial": "Environment partly ready",
+            "blocked": "Environment blocked",
+        },
         "status": {
             "ready": "Ready",
             "active": "Now",
@@ -233,6 +282,14 @@ UI_TEXT = {
         "copied": "Команда скопирована",
         "rewards": "наград",
         "live": "Обновляется автоматически",
+        "checks": "Проверено",
+        "blockers": "Блокеры",
+        "environment": {
+            "unknown": "Окружение не проверено",
+            "ready": "Окружение готово",
+            "partial": "Окружение готово частично",
+            "blocked": "Окружение заблокировано",
+        },
         "status": {
             "ready": "Можно начать",
             "active": "Сейчас",
@@ -295,6 +352,23 @@ def render(state: dict) -> str:
     theme = state["theme"]
     nodes = state["nodes"]
     ui = UI_TEXT.get(str(state["language"]).split("-")[0], UI_TEXT["en"])
+    environment = state.get("environment")
+    environment_html = ""
+    if environment is not None:
+        environment_status = environment["status"]
+        environment_icon = {
+            "unknown": "○",
+            "ready": "✓",
+            "partial": "!",
+            "blocked": "×",
+        }[environment_status]
+        environment_html = (
+            f'<p class="environment {esc(environment_status)}" '
+            f'data-environment-status="{esc(environment_status)}">'
+            f'<strong>{environment_icon} {esc(ui["environment"][environment_status])}</strong>'
+            f' · {esc(ui["checks"])}: {len(environment["working"])}'
+            f' · {esc(ui["blockers"])}: {len(environment["blockers"])}</p>'
+        )
     complete = sum(node["status"] in {"done", "skipped"} for node in nodes)
     percent = round(complete * 100 / len(nodes))
     build_id = hashlib.sha256(
@@ -316,7 +390,7 @@ def render(state: dict) -> str:
 :root{{--ink:{theme['ink']};--muted:{theme['muted']};--paper:{theme['paper']};--grass:{theme['background_bottom']};--grass2:{theme['background_top']};--path:{theme['path']};--line:{theme['muted']};--ready:{theme['accent']};--done:{theme['done']};--locked:{theme['locked']};--active:{theme['accent']};--revisit:{theme['revisit']};}}
 *{{box-sizing:border-box}} html{{scroll-behavior:smooth}} body{{margin:0;color:var(--ink);font:15px/1.4 ui-rounded,"SF Pro Rounded",system-ui,sans-serif;background:linear-gradient(155deg,var(--grass2),var(--grass) 58%,var(--paper));min-height:100vh}}
 header{{position:sticky;top:0;z-index:10;padding:12px 18px;background:color-mix(in srgb,var(--paper) 91%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid rgba(38,50,37,.14)}}
-.top{{max-width:920px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}} h1{{font-size:clamp(22px,4vw,34px);line-height:1.05;margin:0}} .goal{{max-width:650px;margin:5px 0 0;color:var(--muted);font-size:14px}}
+.top{{max-width:920px;margin:auto;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}} h1{{font-size:clamp(22px,4vw,34px);line-height:1.05;margin:0}} .goal{{max-width:650px;margin:5px 0 0;color:var(--muted);font-size:14px}} .environment{{display:inline-block;margin:7px 0 0;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.62);color:var(--muted);font-size:11px}} .environment.ready strong{{color:var(--done)}} .environment.partial strong{{color:var(--revisit)}} .environment.blocked strong{{color:#b42318}}
 .score{{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--paper);border:1px solid rgba(38,50,37,.14);border-radius:16px;box-shadow:0 4px 12px rgba(38,50,37,.08)}} .meter{{min-width:130px;text-align:right;font-weight:850}} progress{{display:block;width:130px;height:9px;accent-color:var(--done)}} #reward-count{{font-size:18px;font-weight:900;white-space:nowrap}}
 .filters{{max-width:920px;margin:9px auto 0;display:flex;gap:6px;overflow:auto}} .filters button{{white-space:nowrap}} .live{{margin-left:auto;color:var(--muted);font-size:12px;align-self:center;white-space:nowrap}}
 main{{position:relative;max-width:920px;margin:auto;padding:30px 18px 100px;overflow:hidden}} .trail{{position:absolute;z-index:0;left:50%;top:0;bottom:0;width:150px;transform:translateX(-50%);background-size:150px 360px;background-repeat:repeat-y;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 360'%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='{path_color}' stroke-width='58' stroke-linecap='round'/%3E%3Cpath d='M75-20 C8 48 142 118 75 180 C8 242 142 312 75 380' fill='none' stroke='%23ffffff' stroke-opacity='.58' stroke-width='3' stroke-dasharray='7 12'/%3E%3C/svg%3E");filter:drop-shadow(0 3px 0 rgba(38,50,37,.12))}}
@@ -335,7 +409,7 @@ button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;p
 </head>
 <body>
 <header>
-  <div class="top"><div>{f'<img src="{esc(theme["logo"])}" alt="" style="max-width:110px;max-height:36px;margin-bottom:6px">' if theme['logo'] else ''}<h1>{esc(project['name'])}</h1><p class="goal">{esc(project['goal'])}<br>{esc(learner['role'])}</p></div><div class="score"><span id="reward-count">0 ⭐</span><div class="meter">{complete}/{len(nodes)} {esc(labels['nodes'])}<progress value="{complete}" max="{len(nodes)}">{percent}%</progress></div></div></div>
+  <div class="top"><div>{f'<img src="{esc(theme["logo"])}" alt="" style="max-width:110px;max-height:36px;margin-bottom:6px">' if theme['logo'] else ''}<h1>{esc(project['name'])}</h1><p class="goal">{esc(project['goal'])}<br>{esc(learner['role'])}</p>{environment_html}</div><div class="score"><span id="reward-count">0 ⭐</span><div class="meter">{complete}/{len(nodes)} {esc(labels['nodes'])}<progress value="{complete}" max="{len(nodes)}">{percent}%</progress></div></div></div>
   <nav class="filters"><button data-filter="all" aria-pressed="true">{esc(labels['filter_all'])}</button><button data-filter="ready">{esc(labels['filter_ready'])}</button><button data-filter="active">{esc(labels['filter_active'])}</button><button data-filter="done">{esc(labels['filter_done'])}</button><button data-filter="revisit">{esc(labels['filter_revisit'])}</button><span class="live">↻ {esc(ui['live'])}</span></nav>
 </header>
 <main><div class="trail" aria-hidden="true"></div>{node_html}</main>

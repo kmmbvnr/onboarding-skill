@@ -36,6 +36,10 @@ in `.onboarding-demo/`. Both directories stay local to the project.
 Each initial chapter has 5–9 nodes. A node must take no more than 25 minutes.
 Long tasks are split into checkpoints with separate evidence.
 
+The first chapter also records a small local-environment baseline. A failed
+command can still complete a diagnostic node; machine and project blockers are
+tracked separately from learner progress.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

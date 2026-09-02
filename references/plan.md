@@ -32,7 +32,17 @@ neutral theme when the project has no visual system.
 
 Separate evidence from inference. Record unknown company facts as unknown.
 
-## 3. Check only gating knowledge
+## 3. Check the local environment
+
+Use [environment.md](environment.md). Select two to five checks from project
+evidence. Ask the learner to run them one at a time. Record what works and what
+blocks progress. Do not turn a tool or project failure into a learner failure.
+
+If the environment is not fully ready, keep an independent safe branch open.
+Do not lock the whole map when the learner can still inspect, trace, or use a
+small lab.
+
+## 4. Check only gating knowledge
 
 Use two to four short checks when a missing prerequisite can block an early node. Ask the learner to explain, trace, predict, or run something. Do not use trivia.
 
@@ -40,7 +50,7 @@ An experienced learner can place out of a node with clear evidence. A beginner m
 Do not add a node for a tool basic or policy restatement when intake evidence
 already shows that the learner can apply it to the goal.
 
-## 4. Build the route
+## 5. Build the route
 
 Create 5 to 9 nodes for the first chapter. Add later chapters after the learner
 completes a real task. Each node must produce one observable result in 5 to 20
@@ -62,7 +72,7 @@ Add branches only when the role needs them. If a required library or technology 
 
 Do not add a broad topic such as "Learn Django." State the next action instead.
 
-## 5. Save and show
+## 6. Save and show
 
 Create `.onboarding/state.json` as defined in [state.md](state.md). Add `.onboarding/` to `.git/info/exclude` when possible. Render and open the first map:
 

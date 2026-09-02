@@ -1,5 +1,19 @@
 # Eval-driven changes
 
+## 2026-09-02 — failed command is evidence, not a skip
+
+- Source: human review of the Together onboarding trial.
+- Evidence: the learner ran the correct focused test and supplied the complete
+  database-creation failure. The coach used `skipped` because the test did not
+  pass, although the node evidence asked for the run and traceback.
+- Change: add a local-environment baseline, store working facts and typed
+  blockers, and define completion from the node evidence contract rather than
+  the command exit code.
+- Rule: a failed command can complete a diagnosis node. It cannot make a node
+  `skipped`. A passing-result node uses `stopped` plus `revisit` when an external
+  blocker prevents completion.
+- Validation: four renderer and state tests pass. Skill validation passes.
+
 ## 2026-09-02 — short game loop and earned rewards
 
 - Source: human trial in `/Users/kmmbvnr/Workspace/Together`.

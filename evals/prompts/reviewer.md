@@ -16,6 +16,10 @@ Use these definitions:
 - Do not propose a general skill rule from one stylistic preference.
 - A failed oracle makes the outcome `fail` even if the dialogue sounded good.
 - A harness or dependency failure makes the outcome `blocked`.
+- A failed command can complete a baseline or diagnosis node when its evidence
+  contract asks for the run and the observed cause.
+- Using `skipped` for a failed command is an onboarding error. The coach must
+  separate learner evidence from machine, service, access, or project blockers.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

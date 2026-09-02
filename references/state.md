@@ -38,10 +38,35 @@ Required top-level fields:
   },
   "project": {"name": "", "root": "", "goal": ""},
   "learner": {"role": "", "experience": [], "placed_out": []},
+  "environment": {
+    "checked_at": "YYYY-MM-DD",
+    "status": "unknown",
+    "working": [],
+    "blockers": []
+  },
   "nodes": [],
   "sessions": []
 }
 ```
+
+New project plans include `environment`. Existing states and self-tours can
+omit it. Allowed status values are `unknown`, `ready`, `partial`, and `blocked`.
+
+Each blocker requires:
+
+```json
+{
+  "id": "TEST-DATABASE",
+  "scope": "project",
+  "summary": "The documented test command cannot create its database.",
+  "evidence": "The command exited before tests ran because migration 0036 uses ArrayField on SQLite.",
+  "next_action": "Run the supported PostgreSQL test path or clarify SQLite support."
+}
+```
+
+Allowed blocker scopes are `machine`, `service`, `access`, `project`, and
+`unknown`. Store tool versions and successful checks in `working`. Do not store
+tokens, environment values, or other secrets.
 
 Each node requires:
 
@@ -79,3 +104,8 @@ Write every `labels` value in the user's language. The `footer` tells the user t
 Set `theme` from project-owned visual assets and color tokens. Use CSS hex colors. Paths in `theme.logo` and node `image` are relative to `.onboarding/map.html`. Use an empty string when there is no suitable image.
 
 Each session record requires `date`, `codename`, `result`, `evidence`, and `gap`. The result is `done`, `revisit`, or `stopped`.
+
+`done` means the node evidence was produced. It does not mean every command
+returned zero. `stopped` means an external blocker prevented the required
+result. `skipped` is a node status, not a session result; use it only for prior
+evidence or a node that is no longer needed.
