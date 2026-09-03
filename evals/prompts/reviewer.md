@@ -35,6 +35,9 @@ Use these definitions:
   item exists.
 - A normal production-project map with fewer than 12 nodes needs repository and
   role evidence that its scope is genuinely narrow. Do not reward filler nodes.
+- The first map is not fully delivered until the agent invokes an opener. If
+  browser launch is blocked, it must request GUI permission and retry with the
+  platform opener. Merely reporting the HTML path is a finding.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

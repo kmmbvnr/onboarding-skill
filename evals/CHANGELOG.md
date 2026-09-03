@@ -1,5 +1,16 @@
 # Eval-driven changes
 
+## 2026-09-03 — opening the first map is a required action
+
+- Source: repeated human trial in Together.
+- Evidence: the coach rendered `.onboarding/map.html`, then said that the
+  browser did not open. It did not retry with the macOS `open` command.
+- Change: the renderer falls back to the platform opener and returns a nonzero
+  status when opening still fails. The coach must request GUI permission and
+  retry. It can report only the path after the opener itself fails.
+- Validation: twelve state, renderer, and browser-opening tests pass. Skill
+  validation passes.
+
 ## 2026-09-02 — full route and repository-derived assessment
 
 - Source: human review of a generated project plan.

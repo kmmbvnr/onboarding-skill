@@ -1,18 +1,68 @@
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from subprocess import CompletedProcess
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from create_tour import make_state  # noqa: E402
-from render_map import render, validate  # noqa: E402
+from render_map import main, open_map, render, validate  # noqa: E402
 
 
 class RenderMapTests(unittest.TestCase):
+    def test_open_map_uses_system_opener_after_browser_handler_fails(self) -> None:
+        with (
+            patch("render_map.sys.platform", "darwin"),
+            patch("render_map.webbrowser.open", return_value=False),
+            patch(
+                "render_map.subprocess.run",
+                return_value=CompletedProcess(["open"], 0, "", ""),
+            ) as run,
+        ):
+            opened, error = open_map(Path("/project/.onboarding/map.html"))
+
+        self.assertTrue(opened)
+        self.assertEqual(error, "")
+        self.assertEqual(run.call_args.args[0][0], "open")
+
+    def test_open_map_reports_both_failures(self) -> None:
+        with (
+            patch("render_map.sys.platform", "darwin"),
+            patch("render_map.webbrowser.open", return_value=False),
+            patch(
+                "render_map.subprocess.run",
+                return_value=CompletedProcess(["open"], 1, "", "not permitted"),
+            ),
+        ):
+            opened, error = open_map(Path("/project/.onboarding/map.html"))
+
+        self.assertFalse(opened)
+        self.assertIn("default browser handler returned false", error)
+        self.assertIn("not permitted", error)
+
+    def test_cli_fails_when_open_was_requested_but_no_opener_worked(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            state_path = Path(directory) / "state.json"
+            state_path.write_text(
+                json.dumps(make_state("en", Path("/project"))), encoding="utf-8"
+            )
+            with (
+                patch(
+                    "sys.argv", ["render_map.py", str(state_path), "--open"]
+                ),
+                patch("render_map.open_map", return_value=(False, "not permitted")),
+            ):
+                result = main()
+
+        self.assertEqual(result, 2)
+
     def test_done_node_gets_reward_and_locked_node_does_not(self) -> None:
         state = make_state("ru", Path("/project"))
         state["nodes"][0]["status"] = "done"

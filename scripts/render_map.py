@@ -8,6 +8,7 @@ import hashlib
 import html
 import json
 import re
+import subprocess
 import sys
 import webbrowser
 from pathlib import Path
@@ -287,6 +288,48 @@ def esc(value: object) -> str:
     return html.escape(str(value), quote=True)
 
 
+def open_map(path: Path) -> tuple[bool, str]:
+    """Open a rendered map with the browser handler, then the OS opener."""
+    errors: list[str] = []
+    resolved = path.resolve()
+    try:
+        if webbrowser.open(resolved.as_uri(), new=2):
+            return True, ""
+        errors.append("the default browser handler returned false")
+    except (OSError, webbrowser.Error) as exc:
+        errors.append(f"the default browser handler failed: {exc}")
+
+    command: list[str] | None = None
+    if sys.platform == "darwin":
+        command = ["open", str(resolved)]
+    elif sys.platform.startswith("linux"):
+        command = ["xdg-open", str(resolved)]
+    elif sys.platform == "win32":
+        command = ["cmd", "/c", "start", "", str(resolved)]
+
+    if command is None:
+        errors.append(f"no fallback opener is defined for {sys.platform}")
+        return False, "; ".join(errors)
+
+    try:
+        result = subprocess.run(
+            command,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except OSError as exc:
+        errors.append(f"the system opener failed: {exc}")
+        return False, "; ".join(errors)
+
+    if result.returncode == 0:
+        return True, ""
+    detail = result.stderr.strip() or f"exit code {result.returncode}"
+    errors.append(f"the system opener failed: {detail}")
+    return False, "; ".join(errors)
+
+
 UI_TEXT = {
     "en": {
         "claim": "Claim reward",
@@ -555,8 +598,16 @@ def main() -> int:
         output = args.output or args.state.with_name("map.html")
         output.write_text(render(state), encoding="utf-8")
         print(f"Rendered onboarding map: {output}")
-        if args.open and not webbrowser.open(output.resolve().as_uri(), new=2):
-            print(f"Warning: could not open the browser; open this file: {output}", file=sys.stderr)
+        if args.open:
+            opened, error = open_map(output)
+            if not opened:
+                print(
+                    f"Error: rendered the map but could not open the browser: {error}. "
+                    f"Map: {output.resolve()}",
+                    file=sys.stderr,
+                )
+                return 2
+            print(f"Opened onboarding map: {output.resolve()}")
         return 0
     except (OSError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)

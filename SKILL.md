@@ -48,5 +48,8 @@ python3 <skill-directory>/scripts/render_map.py .onboarding/state.json
 ```
 
 Use `--open` for the first project plan or self-tour. The renderer validates the
-state before it writes the HTML file. The open page checks for a new render
+state before it writes the HTML file and returns a nonzero status when the map
+was rendered but the browser could not open. Treat that status as unfinished
+work: request GUI permission when needed and retry the system opener. Do not
+only tell the user that the map exists. The open page checks for a new render
 every 10 seconds.

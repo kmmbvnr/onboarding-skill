@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import webbrowser
+import sys
 from pathlib import Path
 
-from render_map import render, validate
+from render_map import open_map, render, validate
 
 
 TEXT = {
@@ -140,7 +140,14 @@ def main() -> int:
         map_path.write_text(render(state), encoding="utf-8")
         print(f"Tour already exists. Rendered map: {map_path}")
         if args.open:
-            webbrowser.open(map_path.resolve().as_uri(), new=2)
+            opened, error = open_map(map_path)
+            if not opened:
+                print(
+                    f"Error: rendered the tour but could not open the browser: {error}",
+                    file=sys.stderr,
+                )
+                return 2
+            print(f"Opened onboarding tour: {map_path}")
         return 0
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -150,7 +157,14 @@ def main() -> int:
     map_path.write_text(render(state), encoding="utf-8")
     print(f"Created onboarding tour: {map_path}")
     if args.open:
-        webbrowser.open(map_path.resolve().as_uri(), new=2)
+        opened, error = open_map(map_path)
+        if not opened:
+            print(
+                f"Error: created the tour but could not open the browser: {error}",
+                file=sys.stderr,
+            )
+            return 2
+        print(f"Opened onboarding tour: {map_path}")
     return 0
 
 

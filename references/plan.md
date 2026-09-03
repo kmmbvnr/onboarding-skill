@@ -118,7 +118,11 @@ python3 <skill-directory>/scripts/render_map.py .onboarding/state.json --open
 ```
 
 Do not wait for the user to ask you to open it. If the runtime blocks browser
-launch, give the exact map path. Later renders refresh the open page.
+launch, request GUI permission and retry with the absolute map path and the
+platform opener: `open` on macOS, `xdg-open` on Linux, or `start` on Windows.
+Do not merely offer to open the map. Only after the opener itself fails can you
+report the error and give the exact clickable map path. Later renders refresh
+the open page.
 
 Report:
 

@@ -18,6 +18,10 @@ For another user language, create the English state, translate display text and 
 
 Add `.onboarding-demo/` to `.git/info/exclude` when the directory is inside a Git project. Open the map without waiting for the user to ask. Then start `TOUR-START` without another question.
 
+If browser launch is blocked, request GUI permission and retry with the
+platform opener. Do not continue the tour after only reporting the map path.
+Give the path only when the opener itself fails.
+
 If tour state exists, continue its active, revisit, or next ready node.
 
 ## Nodes
