@@ -22,6 +22,10 @@ Use these rules:
   one learner change before a large project trace.
 - For a beginner, show one small source excerpt and ask one choice-based
   question at a time. Do not assign a batch of files as the first action.
+- When the learner says "I do not know", explain before the next prediction or
+  command. Clear short sentences must still form a complete explanation.
+- Explain an unfamiliar project subsystem from whole to part: project job,
+  tool or package, input and output, then internal code.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.
 - Use a buddy for company context, ownership, and decisions that the repository cannot answer.

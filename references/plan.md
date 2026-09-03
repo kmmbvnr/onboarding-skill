@@ -99,15 +99,21 @@ when an approved work item exists. Omit parts that the role does not use.
 Add branches only when the role needs them. If a required library or technology is missing, add a small lab under `.onboarding/labs/<codename>/`. The lab must teach the idiomatic basics before the learner studies project-specific use. A lab is practice, not a fabricated product task.
 
 When the learner reports theory without practice for a gating technology, add
-a one-to-three-node bridge before a large project trace: its purpose in this
-project, one minimal example, and one small learner change. Do not replace this
-bridge with "read these project files."
+a one-to-three-node bridge before the first learner action that uses it: its
+purpose in this project, one minimal example, and one small learner change. A
+reproduction command that creates unfamiliar source input also needs this
+bridge. Do not replace it with "read these project files."
 
 For a beginner, do not make a multi-layer code trace the first ready node. Use
 the first chapter to cross the flow in small hops. A trace node should normally
 cover one concept or one to two adjacent transitions. Its first learner action
 must need no more than one new project file. The coach will inspect and show the
 relevant excerpt during the lesson.
+
+Before the first code-focused node in an unfamiliar subsystem, include a short
+orientation in that node or a preceding node. It must connect the project job
+to the subsystem, name what the tool or package is, show its input and output,
+and place it in a small flow. Do not begin with an internal function name.
 
 Avoid one fully linear chain when an access request can take time. Link each
 open blocker only to the nodes it prevents. Keep at least one useful independent

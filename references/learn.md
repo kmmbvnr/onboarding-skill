@@ -24,6 +24,10 @@ node.
 
 ## Teach
 
+Use [teaching.md](teaching.md) to select the support level for the current
+concept. Do not use the learner's general seniority as proof that they know a
+specific language or tool.
+
 Inspect the relevant project files before the lesson. Do not assume that the
 learner saw the paths in the HTML map. Repeat the exact path needed for the
 current action in the chat.
@@ -43,9 +47,11 @@ Introduce at most one new project file per learner turn. A node can contain
 several `project_paths`, but reveal them one at a time. Do not say "read these
 files and send a trace" as one action.
 
-Use two to four small checks across a beginner node. Prefer choices, ordering,
-matching, or prediction before free recall. Reduce the support after correct
-answers. End with one short retrieval that matches the node evidence.
+Use three to five small checks across an `unknown` or `theory-only` concept.
+Ask one per message and state progress, such as "Question 2 of 4." Prefer
+choices, ordering, matching, or a filled example with one blank before free
+recall. Reduce the support after correct answers. End with one short retrieval
+that matches the node evidence.
 
 For an experienced learner, use the compact loop:
 
@@ -55,6 +61,10 @@ For an experienced learner, use the compact loop:
 4. Ask what the learner observed.
 5. Give direct feedback. Explain one gap at a time.
 6. Ask for a final retrieval, trace, run, or small change that matches the node evidence.
+
+If the learner says that they do not know a concept used by the active node,
+stop the compact loop. Switch to the teach-first loop. Explain the concept
+before another prediction or command.
 
 Do not paste the answer before the learner tries. A focused source excerpt is
 context, not an answer leak, when the learner still has to predict its behavior

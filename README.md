@@ -55,6 +55,14 @@ For a beginner, the coach shows one focused source excerpt at a time and uses
 short choice-based checks. It does not assign a batch of files as the first
 action.
 
+When a learner does not know a concept, the coach explains it before another
+prediction or command. Support is selected per concept, not by job title or
+general seniority.
+
+The first visit to a project subsystem starts with its job, input, output, and
+place in the project flow. A teach-first topic uses several one-at-a-time checks
+and reduces support from a worked example to a learner variation.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

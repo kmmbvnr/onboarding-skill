@@ -44,6 +44,21 @@ Use these definitions:
   choice-based question. Paths present only in the HTML map are not sufficient.
 - Introduce at most one new project file per learner turn. Do not penalize a
   compact challenge when the learner has already shown practical experience.
+- Judge support per concept, not by general seniority. After "I do not know",
+  another prediction or unexplained command is a teaching failure. Expect a
+  definition, minimal example, project relevance, recognition check, and small
+  learner variation.
+- A bridge must precede the first learner action that uses unfamiliar syntax,
+  including a reproduction command that creates input in that language. ASD
+  Simplified Technical English requires clear sentences, not missing context.
+- On first contact with a project-specific subsystem, starting at an internal
+  function without explaining the parent tool's job, type, input, output, and
+  place in the project flow is a missing orientation.
+- For an `unknown` or `theory-only` concept, expect three to five checks, one per
+  message, with progress shown. Good scaffolding fades from a worked example to
+  choices or a filled blank, then a learner variation and short recall. On a
+  miss, the coach explains the specific gap and checks it again on a fresh
+  example.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

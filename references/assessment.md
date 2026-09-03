@@ -72,8 +72,8 @@ missing prerequisite. Do not quiz every dependency. Defer non-gating libraries
 until the learner reaches the branch that uses them.
 
 Treat "I know the theory but have not used it" as a practical gap. Do not send
-that learner directly into a large project file. Add a short bridge before the
-first project trace:
+that learner directly into an action that requires the technology. Add a short
+bridge before the first command, input, or project trace that uses it:
 
 1. explain the technology's job in this project;
 2. show one minimal idiomatic example;
@@ -83,10 +83,21 @@ first project trace:
 Use one to three nodes of 5 to 15 minutes. Skip or shorten the bridge when the
 learner produces equivalent practical evidence.
 
+The dependency order must put the bridge before the first learner action that
+uses unfamiliar syntax. If reproducing a bug already needs that syntax, teach
+it first or let the coach run the reproduction as a worked demonstration.
+
+When the learner is new to the project, assume that project-specific commands,
+packages, services, and formats need a short orientation. Explain the parent
+tool's job, input, output, and place in the project flow before teaching its
+internal code. This orientation can be the first exchange of a bridge node; it
+does not always need a separate node.
+
 Default to questions with three or four answer choices during this bridge. Add
-an "I am not sure" choice. Show one small example or project excerpt before the
-question. Do not ask for a blank-page architecture explanation as the first
-practical check.
+an "I am not sure" choice. Use three to five checks, one per message, and show
+question progress. Move from a worked example through choices or a filled
+example with one blank to one learner variation. Do not ask for a blank-page
+architecture explanation as the first practical check.
 
 Stop the initial assessment when the first chapter is tailored and the learner
 has a safe next action. Continue assessment just in time during later nodes.

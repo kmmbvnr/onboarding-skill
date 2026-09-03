@@ -7,7 +7,10 @@ description: Learn how to use onboarding, or plan and run a project-specific dev
 
 Help a developer reach the next safe work action in the current project.
 
-Use the user's language. Apply ASD-STE100 principles: use short sentences, active voice, one term for one concept, and define uncommon terms. Keep commands, paths, symbols, and library names unchanged.
+Use the user's language. Apply ASD-STE100 principles: use short sentences,
+active voice, one term for one concept, and define uncommon terms. Short
+sentences do not mean a short explanation. Keep commands, paths, symbols, and
+library names unchanged.
 
 ## Modes
 
@@ -16,8 +19,8 @@ The user invokes only `$onboarding`. Infer the mode from the request.
 - `lead`: Interview the supervisor. Create a short onboarding message from the supervisor to the new developer. Read [references/lead.md](references/lead.md).
 - `tour`: Teach the user how to use this skill. Read [references/tour.md](references/tour.md) and [references/state.md](references/state.md).
 - `plan`: Assess the learner, inspect the project, check the local environment, and create the learning map. Read [references/plan.md](references/plan.md), [references/assessment.md](references/assessment.md), [references/environment.md](references/environment.md), [references/principles.md](references/principles.md), and [references/state.md](references/state.md).
-- `TOUR-*`: Continue the self-tour node. Read [references/tour.md](references/tour.md), [references/learn.md](references/learn.md), and [references/state.md](references/state.md).
-- `CODENAME`: Run the named node. With no codename, run the next ready node. Read [references/learn.md](references/learn.md), [references/environment.md](references/environment.md) when a command cannot run or fails, [references/principles.md](references/principles.md), and [references/state.md](references/state.md).
+- `TOUR-*`: Continue the self-tour node. Read [references/tour.md](references/tour.md), [references/learn.md](references/learn.md), [references/teaching.md](references/teaching.md), and [references/state.md](references/state.md).
+- `CODENAME`: Run the named node. With no codename, run the next ready node. Read [references/learn.md](references/learn.md), [references/teaching.md](references/teaching.md), [references/environment.md](references/environment.md) when a command cannot run or fails, [references/principles.md](references/principles.md), and [references/state.md](references/state.md).
 - `ask`: Help the learner decide whether to ask a person. Read [references/ask.md](references/ask.md).
 - `report [final]`: Create a daily or final supervisor report. Read [references/report.md](references/report.md) and [references/state.md](references/state.md).
 

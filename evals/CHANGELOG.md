@@ -1,5 +1,20 @@
 # Eval-driven changes
 
+## 2026-09-03 — teach before testing an unknown concept
+
+- Source: human review of `BASELINE-RUN` in the Wesnoth trial.
+- Evidence: after the learner said they did not know Lua, the coach introduced
+  "long-bracket string", asked for a syntax prediction, and supplied a compound
+  shell reproduction without first explaining Lua strings or the command.
+- Change: select support per concept. "I do not know" activates a teach-first
+  loop with a definition, minimal and contrasting examples, a safe coach
+  demonstration, a choice check, and one learner variation. Put the bridge
+  before the first action that uses the unfamiliar syntax. First orient the
+  learner to the parent subsystem. Use three to five one-at-a-time checks and a
+  faded-support ladder inspired by the existing Rundrill teaching contract.
+- Validation: skill validation and twelve deterministic tests pass. A fresh
+  behavioral trace remains pending.
+
 ## 2026-09-03 — guided code discovery for beginners
 
 - Source: human review of the first `EVENT-RIVER` lesson.
