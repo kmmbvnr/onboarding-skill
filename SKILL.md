@@ -55,4 +55,4 @@ state before it writes the HTML file and returns a nonzero status when the map
 was rendered but the browser could not open. Treat that status as unfinished
 work: request GUI permission when needed and retry the system opener. Do not
 only tell the user that the map exists. The open page checks for a new render
-every 10 seconds.
+when it regains focus and every 10 seconds while it stays visible.

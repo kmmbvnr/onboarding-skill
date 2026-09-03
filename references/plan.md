@@ -129,6 +129,10 @@ Do not add a broad topic such as "Learn Django." State the next action instead.
 
 Create `.onboarding/state.json` as defined in [state.md](state.md). Add `.onboarding/` to `.git/info/exclude` when possible. Render and open the first map:
 
+The state reference is the map template. Fill its documented fields. Do not
+invent another JSON shape, and do not write or patch `map.html` directly. The
+renderer owns all HTML, CSS, refresh behavior, and layout.
+
 ```bash
 python3 <skill-directory>/scripts/render_map.py .onboarding/state.json --open
 ```

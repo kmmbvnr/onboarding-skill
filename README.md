@@ -67,6 +67,10 @@ The skill detects common graphical editors and can open the current source file
 at the teaching line. It also tells the learner how to interrupt the route and
 request examples, hints, simpler explanations, or a pacing change.
 
+The agent writes `.onboarding/state.json` from the documented schema. A single
+deterministic renderer owns the HTML, CSS, live refresh, and interaction code;
+the agent does not design a new page for each project.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

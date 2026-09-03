@@ -1,5 +1,19 @@
 # Eval-driven changes
 
+## 2026-09-03 — refresh on return and wrap detail labels
+
+- Source: human and browser review of the Wesnoth onboarding map.
+- Evidence: a learner returned from the agent to a `file://` map and waited for
+  the ten-second refresh interval. The Russian label `Доказательство` was wider
+  than the fixed 70-pixel detail column and overlapped its value.
+- Change: check for a new render immediately on window focus or restored page
+  visibility, with the interval as a fallback. Stack detail labels above their
+  values and allow long text to wrap. State explicitly that the model writes
+  state from the reference and never invents map HTML.
+- Validation: nineteen deterministic tests pass. Browser review at the Wesnoth
+  card width shows each label above its value with no overlap. A dispatched
+  focus event caused an immediate map-check request between interval requests.
+
 ## 2026-09-03 — open source at the teaching line
 
 - Source: human review of the Wesnoth teaching interaction.

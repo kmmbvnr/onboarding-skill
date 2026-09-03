@@ -76,6 +76,19 @@ class RenderMapTests(unittest.TestCase):
         self.assertIn('name="onboarding-build"', output)
         self.assertIn("location.reload()", output)
 
+    def test_map_checks_for_updates_when_it_regains_focus(self) -> None:
+        output = render(make_state("en", Path("/project")))
+
+        self.assertIn("window.addEventListener('focus',refreshMap)", output)
+        self.assertIn("document.addEventListener('visibilitychange'", output)
+        self.assertIn("setInterval(refreshMap,10000)", output)
+
+    def test_detail_columns_can_wrap_without_overlap(self) -> None:
+        output = render(make_state("ru", Path("/project")))
+
+        self.assertIn("grid-template-columns:minmax(0,1fr)", output)
+        self.assertIn("overflow-wrap:anywhere", output)
+
     def test_long_node_is_rejected(self) -> None:
         state = make_state("en", Path("/project"))
         state["nodes"][0]["estimated_minutes"] = 26
