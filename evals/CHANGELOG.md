@@ -1,5 +1,27 @@
 # Eval-driven changes
 
+## 2026-09-03 — open source at the teaching line
+
+- Source: human review of the Wesnoth teaching interaction.
+- Evidence: the coach named `machine.py:212`, but the learner had to ask it to
+  open that location in Zed. The `zed` command was absent from `PATH` although
+  Zed's bundled macOS CLI was installed. The learner also had to ask explicitly
+  for examples and did not know which tutor actions were available.
+- Change: detect a preferred graphical editor, save it in local state, and use
+  a fixed helper to open the exact file, line, and column. Detect both PATH
+  commands and standard macOS app CLI paths. Keep the source excerpt in chat.
+  Explain once that the learner can interrupt for examples, simpler wording,
+  hints, file opening, repetition, or a pacing change.
+- Follow-up evidence: the coach tried to close `BASELINE-RUN` by asking the
+  learner to restate its supplied sentence. The learner still did not know the
+  execution path or the purpose of `PendingLuaString`.
+- Follow-up change: explain a short execution story and separate code, control,
+  and data state. Do not accept "understood" or immediate parroting as node
+  evidence.
+- Validation: local detection finds the bundled Zed CLI even though `zed` is
+  absent from `PATH`. Skill validation and seventeen deterministic tests pass.
+  A fresh behavioral trace remains pending.
+
 ## 2026-09-03 — teach before testing an unknown concept
 
 - Source: human review of `BASELINE-RUN` in the Wesnoth trial.

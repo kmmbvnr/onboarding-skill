@@ -59,6 +59,21 @@ Use these definitions:
   choices or a filled blank, then a learner variation and short recall. On a
   miss, the coach explains the specific gap and checks it again on a fresh
   example.
+- When a graphical editor is detected or saved, the coach opens the current
+  source file at the exact line before discussing it. A successful editor-open
+  action does not replace the excerpt and explanation in chat. Editor absence
+  is not a blocker.
+- The first learning interaction must tell the learner that they can interrupt
+  and request an example, simpler explanation, hint, file opening, repetition,
+  or pacing change. Later difficult turns should offer one relevant action, not
+  repeat a generic menu or only ask "Any questions?"
+- When the learner lacks execution context, expect a three-to-six-step story
+  from input and entry point to the current function and state change. Separate
+  code path, control state, and data state. Do not call a static trace a runtime
+  call stack.
+- "Say understood" or repeating the coach's sentence is not completion
+  evidence. Use a fresh example, choice, trace, or learner action before marking
+  the node done.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

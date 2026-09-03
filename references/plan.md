@@ -41,6 +41,10 @@ long-lead access before it blocks a later chapter. Ask the learner to run checks
 one at a time. Record what works and what blocks progress. Do not turn a tool or
 project failure into a learner failure.
 
+Detect the learner's graphical source editor. Save one unambiguous result in
+`preferences.editor`, or ask once when several editors are available. This is a
+convenience preference, not a blocker.
+
 If the environment is not fully ready, keep an independent safe branch open.
 Do not lock the whole map when the learner can still inspect, trace, or use a
 small lab.

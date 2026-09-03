@@ -116,6 +116,13 @@ def validate(state: dict) -> None:
         if not isinstance(learner.get(field), list):
             fail(f"learner.{field} must be an array")
 
+    preferences = state.get("preferences")
+    if preferences is not None:
+        if not isinstance(preferences, dict) or set(preferences) != {"editor"}:
+            fail("preferences must contain only editor")
+        if preferences.get("editor") not in {"zed", "code", "cursor", "subl"}:
+            fail("preferences.editor is invalid")
+
     blocked_node_refs: list[tuple[str, str]] = []
     environment = state.get("environment")
     if environment is not None:

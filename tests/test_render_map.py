@@ -83,6 +83,16 @@ class RenderMapTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "between 1 and 25"):
             validate(state)
 
+    def test_editor_preference_is_validated(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["preferences"] = {"editor": "zed"}
+
+        validate(state)
+
+        state["preferences"]["editor"] = "arbitrary-command"
+        with self.assertRaisesRegex(ValueError, "preferences.editor is invalid"):
+            validate(state)
+
     def test_chapter_markers_are_rendered_when_chapter_changes(self) -> None:
         state = make_state("en", Path("/project"))
         state["nodes"][0]["chapter"] = "First steps"

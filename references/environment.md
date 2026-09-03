@@ -32,6 +32,17 @@ Ask the learner to run one check at a time. Do not request secrets. Do not
 install software, start shared services, or change project configuration unless
 the user asks.
 
+Detect a graphical source editor as a convenience check:
+
+```bash
+python3 <skill-directory>/scripts/open_source.py --detect
+```
+
+Use `preferences.editor` when it already exists. Otherwise prefer `$VISUAL` or
+`$EDITOR`. When detection finds exactly one supported graphical editor, store
+it. When it finds several or none, ask the learner once which editor they use.
+Do not install an editor. Editor availability is not a readiness blocker.
+
 Record successful facts in `environment.working`. Record a blocker only when it
 changes the safe next action.
 

@@ -26,6 +26,8 @@ Use these rules:
   command. Clear short sentences must still form a complete explanation.
 - Explain an unfamiliar project subsystem from whole to part: project job,
   tool or package, input and output, then internal code.
+- Explain a call or state path as a short input-to-output story. Do not accept
+  "understood" as evidence of learning.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.
 - Use a buddy for company context, ownership, and decisions that the repository cannot answer.

@@ -52,6 +52,15 @@ Required top-level fields:
 New project plans include `environment`. Existing states and self-tours can
 omit it. Allowed status values are `unknown`, `ready`, `partial`, and `blocked`.
 
+Project state can include a local preference:
+
+```json
+"preferences": {"editor": "zed"}
+```
+
+Supported editor names are `zed`, `code`, `cursor`, and `subl`. Detect the
+preference once. Do not store arbitrary commands or global editor settings.
+
 Each blocker requires:
 
 ```json

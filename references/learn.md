@@ -32,6 +32,23 @@ Inspect the relevant project files before the lesson. Do not assume that the
 learner saw the paths in the HTML map. Repeat the exact path needed for the
 current action in the chat.
 
+Before the first source excerpt, read `preferences.editor`. If it is absent,
+run the editor detection from [environment.md](environment.md). Save one
+unambiguous result. If several editors are available, ask the learner once.
+When the learner names an editor, use it immediately and save the preference.
+
+Open the exact source location before you discuss it:
+
+```bash
+python3 <skill-directory>/scripts/open_source.py \
+  --editor <editor> --line <line> --column <column> <absolute-file>
+```
+
+Request GUI permission and retry when required. Do not claim that the file is
+open until the command succeeds. If no supported editor is available, continue
+with the clickable link and excerpt. Do not block learning. Opening the editor
+does not replace showing the focused excerpt in chat.
+
 For a beginner or a learner with theory but no practice, guide discovery:
 
 1. Select one small concept or one adjacent transition in the project flow.
@@ -82,6 +99,12 @@ Guide source changes only when the node requires a real low-risk task. The learn
 Mark a node `done` only when the recorded evidence matches its `evidence` field.
 A nonzero exit does not prevent `done` when the node goal was to run, observe,
 or diagnose the command. Record the blocker separately.
+
+Do not close a node by asking the learner to say "understood" or to repeat a
+sentence that the coach just supplied. Before completion, use a fresh small
+example, choice, trace, or learner action that requires the same mental model.
+If the learner says they still lack the overall context, return to the
+execution story and keep the node active.
 
 Use `revisit` when the learner needs more knowledge or practice. Use a
 `stopped` session and an environment blocker when the machine, service, access,

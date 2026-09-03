@@ -63,6 +63,10 @@ The first visit to a project subsystem starts with its job, input, output, and
 place in the project flow. A teach-first topic uses several one-at-a-time checks
 and reduces support from a worked example to a learner variation.
 
+The skill detects common graphical editors and can open the current source file
+at the teaching line. It also tells the learner how to interrupt the route and
+request examples, hints, simpler explanations, or a pacing change.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval
