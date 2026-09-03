@@ -12,6 +12,8 @@ needed for the first chapter:
 - the supported dependency or environment command;
 - one required local service, such as a database or queue;
 - one focused test, build, or start command near the learner's goal.
+- one focused formatter, linter, or static check when the target code and
+  project workflow require it.
 
 Also identify external systems needed for normal work. Derive each system from
 repository evidence, such as Git remotes, CI workflows, deployment files,
@@ -59,6 +61,10 @@ or external access is unverified. Record an unverified requirement as an
 - `unknown`: the evidence is not sufficient yet.
 
 Do not label an environment blocker as a learner knowledge gap.
+
+Do not create an environment blocker for normal CI, code review, approval, or
+reply latency after the learner has submitted their work. Use a `waiting` node
+from [state.md](state.md).
 
 For each blocker, set `waiting_for` to the person, team, or learner action that
 can resolve it. Set `blocks` to the exact node codenames that cannot continue.

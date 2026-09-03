@@ -9,8 +9,20 @@ unfinished node longer than 25 minutes, split that node into short checkpoints.
 Preserve completed nodes, session evidence, and claimed capability. Render the
 migrated map before the lesson.
 
-Build the set of waiting codenames from `environment.blockers[].blocks`. Do not
-select one of those nodes while its blocker is open.
+Also migrate a node from `active` or `locked` to `waiting` when the learner has
+completed every available action and progress now depends only on CI, review,
+approval, or a reply. Record `waiting_for`, `check_after`, and one read-only
+`check_action`. Do not ask a quiz whose intended answer is only "wait".
+
+Before node selection, inspect waiting nodes. When `check_after` is today or in
+the past, perform its read-only check once if current access permits it. Do not
+sleep or poll. If the external event is still pending, move `check_after` to the
+next reasonable work date and continue onboarding. If it creates a learner
+action, change the node to `ready` or `revisit` and remove `wait`.
+
+Build the set of waiting codenames from `environment.blockers[].blocks` and
+nodes whose status is `waiting`. Do not select them while the dependency is
+open.
 
 Select the requested codename. If there is no codename, select the first
 unblocked `active` node, then the first unblocked `revisit` node, then the first
@@ -21,6 +33,11 @@ If there is no project state, route to `plan`. If there is no tour state, route
 to `tour`. If the requested node is locked or waits for an external action,
 explain the specific prerequisite or blocker and offer the nearest unblocked
 node.
+
+Audit dependencies when a node starts waiting. Remove the waiting node from a
+later node's `requires` when that later action does not need the external
+result. Keep the last real prerequisite instead. Set the independent node to
+`ready` when its remaining requirements are complete.
 
 ## Teach
 
@@ -92,6 +109,14 @@ Help the learner start the project and inspect errors. Confirm commands from pro
 When a command cannot run or fails, use [environment.md](environment.md). Keep
 the command, exit result, and smallest useful error as evidence.
 
+Before the learner's first product-code change in a module, teach its local
+code-quality path. Use documented contribution rules, formatter or linter
+configuration, CI, and a small nearby source example. State which rules a tool
+checks and which rules a reviewer checks. Ask one concrete choice, comparison,
+or fix-the-snippet question at a time. Then let the learner run the smallest
+documented formatter, linter, or static check that covers the target. Do not
+teach generic style trivia or claim that one nearby example is a project rule.
+
 Guide source changes only when the node requires a real low-risk task. The learner makes the change. Do not edit product code unless the learner explicitly asks you to do it.
 
 ## Complete
@@ -111,10 +136,16 @@ Use `revisit` when the learner needs more knowledge or practice. Use a
 or project prevents the required result. Use `skipped` only when prior evidence
 makes the node unnecessary. Never use `skipped` for a failed command.
 
-When an external blocker appears, set an attempted node to `revisit` or an
-unstarted node to `locked`. Record who or what resolves it and the exact blocked
-codenames. Then continue an independent node. Set environment status to
-`blocked` only when no useful unblocked node remains.
+When a machine, service, access, or project blocker appears, set an attempted
+node to `revisit` or an unstarted node to `locked`. Record who or what resolves
+it and the exact blocked codenames. Set environment status to `blocked` only
+when no useful unblocked node remains.
+
+When the learner completed their part but CI, review, approval, or a reply is
+pending, keep the completed node `done` and set the response-dependent node to
+`waiting`. Do not call it active or an environment failure. Record the next
+check and continue an independent node. The skill checks waits only when it is
+invoked; it does not promise background monitoring.
 
 Append a short session record. Include the date, result, evidence, and one remaining gap. Set newly unlocked and unblocked nodes to `ready`. Render the map again. Do not open a new browser tab. The existing map refreshes itself.
 
@@ -126,4 +157,5 @@ End with:
 
 - what the learner can now do;
 - the next ready codename;
+- one waiting item and its next check, when one exists;
 - one open question, if one exists.

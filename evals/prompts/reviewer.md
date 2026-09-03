@@ -74,6 +74,16 @@ Use these definitions:
 - "Say understood" or repeating the coach's sentence is not completion
   evidence. Use a fresh example, choice, trace, or learner action before marking
   the node done.
+- When the learner has submitted their work and only CI, review, approval, or a
+  reply remains, the response-dependent node is `waiting`, not `active`. It
+  names who or what is pending, a next check date, and one read-only check. It
+  is not an environment failure and must not block an independent node. A quiz
+  whose intended answer is only "wait" is not a useful learning step.
+- Before a first product-code change, expect a short project-specific quality
+  gate unless the learner already proved it. It must use contribution rules,
+  formatter or linter configuration, CI, and nearby target code to distinguish
+  tool-enforced rules from review-only conventions. Do not reward generic style
+  trivia or unsupported rules inferred from one file.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

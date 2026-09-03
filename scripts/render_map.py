@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import html
 import json
@@ -16,7 +17,7 @@ from pathlib import Path
 
 KINDS = {"orientation", "check", "setup", "trace", "lab", "task", "review"}
 TARGETS = {"recognize", "operate", "modify"}
-STATUSES = {"locked", "ready", "active", "done", "revisit", "skipped"}
+STATUSES = {"locked", "ready", "active", "waiting", "done", "revisit", "skipped"}
 ENVIRONMENT_STATUSES = {"unknown", "ready", "partial", "blocked"}
 BLOCKER_SCOPES = {"machine", "service", "access", "project", "unknown"}
 CODENAME = re.compile(r"^[A-Z0-9]+(?:-[A-Z0-9]+)*$")
@@ -211,6 +212,22 @@ def validate(state: dict) -> None:
             fail(f"{label}.target is invalid")
         if node.get("status") not in STATUSES:
             fail(f"{label}.status is invalid")
+        wait = node.get("wait")
+        if node.get("status") == "waiting":
+            expected_wait = {"waiting_for", "check_after", "check_action"}
+            if not isinstance(wait, dict) or set(wait) != expected_wait:
+                fail(f"{label}.wait must contain only: {sorted(expected_wait)}")
+            require_text(wait.get("waiting_for"), f"{label}.wait.waiting_for")
+            check_after = require_text(
+                wait.get("check_after"), f"{label}.wait.check_after"
+            )
+            try:
+                datetime.date.fromisoformat(check_after)
+            except ValueError:
+                fail(f"{label}.wait.check_after must use YYYY-MM-DD")
+            require_text(wait.get("check_action"), f"{label}.wait.check_action")
+        elif "wait" in node:
+            fail(f"{label}.wait is allowed only when status is waiting")
         if not isinstance(node.get("requires"), list):
             fail(f"{label}.requires must be an array")
         if not isinstance(node.get("project_paths"), list):
@@ -267,7 +284,7 @@ def validate(state: dict) -> None:
             fail(f"environment.status blocked has unblocked available nodes: {sorted(available)}")
 
     for node in nodes:
-        if node["status"] in {"ready", "active"}:
+        if node["status"] in {"ready", "active", "waiting"}:
             blocked = [
                 code
                 for code in node["requires"]
@@ -346,6 +363,10 @@ UI_TEXT = {
         "copied": "Copied",
         "rewards": "rewards",
         "live": "Auto-updates",
+        "filter_waiting": "Waiting",
+        "waiting_for": "Waiting for",
+        "check_after": "Check after",
+        "check_action": "Check",
         "checks": "Checks passed",
         "blockers": "Blockers",
         "environment": {
@@ -359,6 +380,7 @@ UI_TEXT = {
             "active": "Now",
             "done": "Done",
             "revisit": "Try again",
+            "waiting": "Waiting",
             "locked": "Locked",
             "skipped": "Skipped",
         },
@@ -371,6 +393,10 @@ UI_TEXT = {
         "copied": "Команда скопирована",
         "rewards": "наград",
         "live": "Обновляется автоматически",
+        "filter_waiting": "Ожидание",
+        "waiting_for": "Ждём",
+        "check_after": "Проверить после",
+        "check_action": "Что проверить",
         "checks": "Проверено",
         "blockers": "Блокеры",
         "environment": {
@@ -384,6 +410,7 @@ UI_TEXT = {
             "active": "Сейчас",
             "done": "Готово",
             "revisit": "Повторить",
+            "waiting": "Ждём ответа",
             "locked": "Закрыто",
             "skipped": "Пропущено",
         },
@@ -406,6 +433,15 @@ def render_node(node: dict, index: int, labels: dict, ui: dict) -> str:
         )
     elif status == "locked":
         action = f'<button type="button" disabled>🔒 {esc(ui["locked"])}</button>'
+    elif status == "waiting":
+        wait = node["wait"]
+        action = (
+            '<div class="wait-status">'
+            f'<strong>⏳ {esc(ui["waiting_for"])}: {esc(wait["waiting_for"])}</strong>'
+            f'<span>{esc(ui["check_after"])}: {esc(wait["check_after"])}</span>'
+            f'<span>{esc(ui["check_action"])}: {esc(wait["check_action"])}</span>'
+            '</div>'
+        )
     elif status == "skipped":
         action = f'<p class="terminal-status">{esc(ui["skipped"])}</p>'
     else:
@@ -500,9 +536,9 @@ main{{position:relative;max-width:920px;margin:auto;padding:30px 18px 100px;over
 .badge{{grid-row:1;z-index:2;justify-self:center;display:grid;place-items:center;width:62px;height:62px;font-size:28px;background:var(--paper);border:4px solid var(--ready);border-radius:50%;box-shadow:0 6px 0 rgba(38,50,37,.18),0 10px 22px rgba(38,50,37,.12)}} .node:nth-of-type(4n+1) .badge{{transform:translateX(-30px)}} .node:nth-of-type(4n+2) .badge{{transform:translateX(24px)}} .node:nth-of-type(4n+3) .badge{{transform:translateX(38px)}}
 .step{{position:absolute;left:calc(50% + 38px);top:52px;z-index:3;background:var(--ink);color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:900}}
 .card{{grid-row:1;background:color-mix(in srgb,var(--paper) 94%,white);border:1px solid rgba(38,50,37,.16);border-radius:18px;padding:14px;box-shadow:0 6px 0 rgba(38,50,37,.12),0 12px 30px rgba(38,50,37,.08);max-width:330px}} .node:nth-of-type(odd) .card{{justify-self:end}} .node:nth-of-type(even) .card{{justify-self:start}}
-.node-image{{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:10px}} .meta{{display:flex;gap:6px;flex-wrap:wrap}} .meta span,.codename{{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}} .meta span{{padding:3px 7px;background:rgba(255,255,255,.72);border-radius:999px}} .status-pill{{color:var(--active)}} .codename{{color:var(--active);margin:9px 0 2px}} h2{{font-size:19px;line-height:1.12;margin:0 0 5px}} p{{margin:5px 0}} details{{margin-top:8px}} summary{{cursor:pointer;font-weight:800}} dl{{display:grid;grid-template-columns:minmax(0,1fr);row-gap:2px;margin:8px 0}} dt{{min-width:0;margin-top:7px;font-weight:800;overflow-wrap:anywhere}} dt:first-child{{margin-top:0}} dd{{min-width:0;margin:0;overflow-wrap:anywhere}} .paths{{display:flex;gap:5px;flex-wrap:wrap}} code{{background:#eef0e3;border-radius:5px;padding:2px 5px;font-size:11px}}
+.node-image{{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:10px}} .meta{{display:flex;gap:6px;flex-wrap:wrap}} .meta span,.codename{{font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}} .meta span{{padding:3px 7px;background:rgba(255,255,255,.72);border-radius:999px}} .status-pill{{color:var(--active)}} .waiting .status-pill{{color:var(--revisit)}} .codename{{color:var(--active);margin:9px 0 2px}} h2{{font-size:19px;line-height:1.12;margin:0 0 5px}} p{{margin:5px 0}} details{{margin-top:8px}} summary{{cursor:pointer;font-weight:800}} dl{{display:grid;grid-template-columns:minmax(0,1fr);row-gap:2px;margin:8px 0}} dt{{min-width:0;margin-top:7px;font-weight:800;overflow-wrap:anywhere}} dt:first-child{{margin-top:0}} dd{{min-width:0;margin:0;overflow-wrap:anywhere}} .paths{{display:flex;gap:5px;flex-wrap:wrap}} code{{background:#eef0e3;border-radius:5px;padding:2px 5px;font-size:11px}}
 button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;padding:7px 10px;cursor:pointer;font-weight:800}} button:focus-visible{{outline:3px solid var(--active);outline-offset:2px}} .card>button{{width:100%;margin-top:9px;background:var(--ink);color:white}} .card>button:disabled{{cursor:not-allowed;background:var(--locked)}} .card>.reward{{background:linear-gradient(135deg,#ffd85a,#ff9d45);color:#3d2600;border-color:#e28d20;box-shadow:0 4px 0 #c87516}} .card>.reward.claimed{{background:var(--done);color:#fff;border-color:var(--done);box-shadow:none}} .terminal-status{{font-weight:800;color:var(--muted)}}
-.done .badge{{border-color:var(--done)}} .active .badge{{border-color:var(--active);animation:pulse 1.6s infinite}} .revisit .badge{{border-color:var(--revisit)}} .locked{{opacity:.58}} .skipped{{opacity:.65}} .hidden{{display:none}} .toast{{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 14px;background:var(--ink);color:white;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.2s}} .toast.show{{opacity:1;transform:translate(-50%,-6px)}} .spark{{position:fixed;z-index:40;pointer-events:none;font-size:22px;animation:burst .85s ease-out forwards}}
+.done .badge{{border-color:var(--done)}} .active .badge{{border-color:var(--active);animation:pulse 1.6s infinite}} .revisit .badge,.waiting .badge{{border-color:var(--revisit)}} .locked{{opacity:.58}} .skipped{{opacity:.65}} .wait-status{{display:grid;gap:3px;margin-top:9px;padding:9px 10px;border-radius:10px;background:color-mix(in srgb,var(--revisit) 12%,white);font-size:12px}} .wait-status span{{color:var(--muted)}} .hidden{{display:none}} .toast{{position:fixed;z-index:30;left:50%;bottom:22px;transform:translateX(-50%);padding:10px 14px;background:var(--ink);color:white;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.2s}} .toast.show{{opacity:1;transform:translate(-50%,-6px)}} .spark{{position:fixed;z-index:40;pointer-events:none;font-size:22px;animation:burst .85s ease-out forwards}}
 @keyframes pulse{{50%{{scale:1.08}}}} @keyframes burst{{to{{translate:var(--x) var(--y);rotate:var(--r);opacity:0;scale:.5}}}}
 .legend{{max-width:920px;margin:auto;padding:0 20px 36px;color:var(--muted);text-align:center}}
 @media(max-width:700px){{.top{{grid-template-columns:1fr}}.score{{justify-content:space-between}}.meter{{text-align:left}}.live{{display:none}}main{{padding-left:10px}}.trail{{left:49px;width:92px;background-size:92px 280px}}.node{{grid-template-columns:82px 1fr;min-height:166px}}.node .badge,.node:nth-of-type(odd) .badge,.node:nth-of-type(even) .badge{{grid-column:1;justify-self:center;transform:none}}.node .card,.node:nth-of-type(odd) .card,.node:nth-of-type(even) .card{{grid-column:2;justify-self:stretch;max-width:none}}.step{{left:65px;top:49px}}}}
@@ -512,7 +548,7 @@ button{{border:1px solid rgba(38,50,37,.18);border-radius:10px;background:#fff;p
 <body>
 <header>
   <div class="top"><div>{f'<img src="{esc(theme["logo"])}" alt="" style="max-width:110px;max-height:36px;margin-bottom:6px">' if theme['logo'] else ''}<h1>{esc(project['name'])}</h1><p class="goal">{esc(project['goal'])}<br>{esc(learner['role'])}</p>{environment_html}</div><div class="score"><span id="reward-count">0 ⭐</span><div class="meter">{complete}/{len(nodes)} {esc(labels['nodes'])}<progress value="{complete}" max="{len(nodes)}">{percent}%</progress></div></div></div>
-  <nav class="filters"><button data-filter="all" aria-pressed="true">{esc(labels['filter_all'])}</button><button data-filter="ready">{esc(labels['filter_ready'])}</button><button data-filter="active">{esc(labels['filter_active'])}</button><button data-filter="done">{esc(labels['filter_done'])}</button><button data-filter="revisit">{esc(labels['filter_revisit'])}</button><span class="live">↻ {esc(ui['live'])}</span></nav>
+  <nav class="filters"><button data-filter="all" aria-pressed="true">{esc(labels['filter_all'])}</button><button data-filter="ready">{esc(labels['filter_ready'])}</button><button data-filter="active">{esc(labels['filter_active'])}</button><button data-filter="waiting">{esc(ui['filter_waiting'])}</button><button data-filter="done">{esc(labels['filter_done'])}</button><button data-filter="revisit">{esc(labels['filter_revisit'])}</button><span class="live">↻ {esc(ui['live'])}</span></nav>
 </header>
 <main><div class="trail" aria-hidden="true"></div>{node_html}</main>
 <p class="legend">{percent}% · {esc(labels['footer'])}</p>

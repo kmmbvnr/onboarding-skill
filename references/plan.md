@@ -22,6 +22,12 @@ delivery clues, and one representative product flow. Use recent history when it
 is available. Do not read the repository from top to bottom. Stop when you have
 enough evidence to build the route.
 
+For a role that changes code, inspect the project-owned code-quality path:
+contribution rules, formatter and linter configuration, pre-commit hooks, CI
+commands, and a small nearby source example. Separate rules enforced by tools
+from conventions enforced only in review. Do not infer a project rule from one
+arbitrary file.
+
 Inspect the names and metadata of project-owned visual assets first. Read at
 most one small token or style file. Do not dump a large SVG or image as text.
 Use the evidence to define the map theme. Prefer an existing project asset when
@@ -100,6 +106,12 @@ include the relevant parts of local operation, one product flow, a safe change,
 focused tests and review, delivery, and observation. Include the change only
 when an approved work item exists. Omit parts that the role does not use.
 
+Before the first product-code change, include a short local-conventions gate
+unless the learner already demonstrated it in this project. It must use the
+target module, not a generic style lesson. Its evidence should distinguish a
+tool-enforced rule from a review-only convention and include the focused lint or
+format command when one exists.
+
 Add branches only when the role needs them. If a required library or technology is missing, add a small lab under `.onboarding/labs/<codename>/`. The lab must teach the idiomatic basics before the learner studies project-specific use. A lab is practice, not a fabricated product task.
 
 When the learner reports theory without practice for a gating technology, add
@@ -119,9 +131,10 @@ orientation in that node or a preceding node. It must connect the project job
 to the subsystem, name what the tool or package is, show its input and output,
 and place it in a small flow. Do not begin with an internal function name.
 
-Avoid one fully linear chain when an access request can take time. Link each
-open blocker only to the nodes it prevents. Keep at least one useful independent
-node ready when project evidence allows it.
+Avoid one fully linear chain when access, CI, review, approval, or another
+external response can take time. Do not make an external-feedback node a
+prerequisite for later work that does not need that feedback. Keep at least one
+useful independent node ready when project evidence allows it.
 
 Do not add a broad topic such as "Learn Django." State the next action instead.
 

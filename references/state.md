@@ -104,6 +104,22 @@ Each node requires:
 }
 ```
 
+Use `waiting` when the learner completed the available action and the node now
+depends only on an external event. A waiting node also requires:
+
+```json
+"status": "waiting",
+"wait": {
+  "waiting_for": "Repository maintainers and CI",
+  "check_after": "2026-09-04",
+  "check_action": "Check the PR checks and new review comments once."
+}
+```
+
+`check_after` uses `YYYY-MM-DD`. Update it after each unresolved check. Do not
+add `wait` to another status. A waiting node is visible, but it is not an active
+lesson and does not block an independent branch.
+
 `chapter` is optional for old state files and self-tours. New project plans set
 it on every node. Use 3 to 5 short chapter names and keep nodes from the same
 chapter adjacent. The map shows a chapter marker when the name changes.
@@ -115,7 +131,7 @@ Allowed values:
 
 - `kind`: `orientation`, `check`, `setup`, `trace`, `lab`, `task`, `review`.
 - `target`: `recognize`, `operate`, `modify`.
-- `status`: `locked`, `ready`, `active`, `done`, `revisit`, `skipped`.
+- `status`: `locked`, `ready`, `active`, `waiting`, `done`, `revisit`, `skipped`.
 
 Codenames must be unique uppercase words joined with hyphens. Dependencies must use codenames. Do not store secrets, environment values, or private tokens.
 
@@ -129,3 +145,7 @@ Each session record requires `date`, `codename`, `result`, `evidence`, and `gap`
 returned zero. `stopped` means an external blocker prevented the required
 result. `skipped` is a node status, not a session result; use it only for prior
 evidence or a node that is no longer needed.
+
+Environment blockers describe missing local capability, service, access, or a
+project problem. Do not use them for normal CI, review, approval, or reply
+latency after the learner has completed their action. Use a waiting node.

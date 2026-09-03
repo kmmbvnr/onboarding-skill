@@ -1,5 +1,22 @@
 # Eval-driven changes
 
+## 2026-09-03 — external waits and project-specific code style
+
+- Source: human review of the Wesnoth PR handoff.
+- Evidence: after the learner opened the PR, the coach marked `REVIEW-LOOP`
+  active and asked a quiz whose correct answer was to wait. It did not label the
+  step as externally owned or continue the independent route. A later review
+  also exposed a project-specific naming convention that the route had not
+  taught or checked.
+- Change: add a visible `waiting` node with owner, next date, and one read-only
+  check. Due waits are checked once per invocation and never selected as a
+  lesson. Rewire unrelated downstream nodes around the wait. Before the first
+  code change, teach and exercise rules from contribution docs, formatter or
+  linter configuration, CI, and nearby target code.
+- Validation: twenty-two deterministic tests and skill validation pass. Tests
+  cover required wait metadata, invalid dates, map output without an action
+  button, and an independent ready node beside a waiting node.
+
 ## 2026-09-03 — refresh on return and wrap detail labels
 
 - Source: human and browser review of the Wesnoth onboarding map.

@@ -89,6 +89,61 @@ class RenderMapTests(unittest.TestCase):
         self.assertIn("grid-template-columns:minmax(0,1fr)", output)
         self.assertIn("overflow-wrap:anywhere", output)
 
+    def test_waiting_node_is_visible_without_an_action_button(self) -> None:
+        state = make_state("ru", Path("/project"))
+        state["nodes"][0]["status"] = "done"
+        state["nodes"][1]["status"] = "waiting"
+        state["nodes"][1]["wait"] = {
+            "waiting_for": "CI и reviewer",
+            "check_after": "2026-09-04",
+            "check_action": "Проверить CI и новые комментарии один раз.",
+        }
+
+        validate(state)
+        output = render(state)
+
+        self.assertIn('data-status="waiting"', output)
+        self.assertIn("Ждём ответа", output)
+        self.assertIn("CI и reviewer", output)
+        self.assertIn("2026-09-04", output)
+        self.assertIn('data-filter="waiting"', output)
+        self.assertNotIn('data-command="$onboarding TOUR-LEAD"', output)
+
+    def test_waiting_node_requires_valid_wait_metadata(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["status"] = "done"
+        state["nodes"][1]["status"] = "waiting"
+
+        with self.assertRaisesRegex(ValueError, "wait must contain"):
+            validate(state)
+
+        state["nodes"][1]["wait"] = {
+            "waiting_for": "CI",
+            "check_after": "tomorrow",
+            "check_action": "Check once.",
+        }
+        with self.assertRaisesRegex(ValueError, "must use YYYY-MM-DD"):
+            validate(state)
+
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["wait"] = None
+        with self.assertRaisesRegex(ValueError, "allowed only"):
+            validate(state)
+
+    def test_independent_node_can_be_ready_while_another_waits(self) -> None:
+        state = make_state("en", Path("/project"))
+        state["nodes"][0]["status"] = "done"
+        state["nodes"][1]["status"] = "waiting"
+        state["nodes"][1]["wait"] = {
+            "waiting_for": "Maintainer",
+            "check_after": "2026-09-04",
+            "check_action": "Read new review comments once.",
+        }
+        state["nodes"][2]["requires"] = [state["nodes"][0]["codename"]]
+        state["nodes"][2]["status"] = "ready"
+
+        validate(state)
+
     def test_long_node_is_rejected(self) -> None:
         state = make_state("en", Path("/project"))
         state["nodes"][0]["estimated_minutes"] = 26

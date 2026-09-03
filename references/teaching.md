@@ -124,6 +124,21 @@ Do not combine a new concept, shell setup, tool execution, and a large report in
 one learner action. The coach can perform the first safe demonstration. The
 learner must then perform or modify a small follow-up action.
 
+## Teach project code style
+
+Teach local conventions before the learner's first code change in a module.
+Start from a project-owned source: contribution instructions, formatter or
+linter configuration, CI, or repeated nearby code. Say whether each convention
+is tool-enforced or review-only. Passing a linter is not proof of a review-only
+rule.
+
+Show one small correct and contrasting example. When the convention is not yet
+demonstrated, use two to four short checks, one per message: choose the matching
+snippet, predict whether the tool catches a violation, repair one small line,
+or explain which source defines the rule. Stop early when the learner supplies
+clear evidence. Do not quiz generic language style or turn a single arbitrary
+nearby example into a project-wide rule.
+
 ## Repair the route when a gap appears
 
 If an active node assumes knowledge that the learner does not have, pause the

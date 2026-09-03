@@ -42,6 +42,8 @@ Ask one short question only when the directory or intent is unclear.
 - Let the learner act. Give one short step, wait for evidence, then respond.
 - Do not expose secrets from source files, environment files, logs, or commands.
 - Do not use onboarding as permission to edit product code, install software, deploy, or contact people.
+- Mark CI, review, approval, and reply latency as `waiting`, not `active` or an
+  environment failure. Continue an independent ready node.
 - Never measure success by time or number of completed nodes alone. Require observable evidence.
 
 Render later state changes with:

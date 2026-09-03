@@ -13,6 +13,12 @@ Inspect safe local evidence when it can answer the question. Do not read or reve
 
 If one clear local check can answer the question, give that check first. Do not draft a message yet. Reassess after the learner reports the result.
 
+If the question already has a `waiting` node, respect its `check_after` date.
+Check the recorded external source once when due. Do not draft repeated pings
+while CI, review, approval, or a reply is still within the expected wait. When a
+follow-up is due, include the completed action, current evidence, elapsed wait,
+and the exact response needed.
+
 Ask a buddy when the missing fact concerns product intent, ownership, policy, access, historical constraints, production state, or a team decision.
 
 Draft the message in the learner's language. Apply ASD-STE100 principles. Do not invent attempts or results.

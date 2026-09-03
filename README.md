@@ -71,6 +71,10 @@ The agent writes `.onboarding/state.json` from the documented schema. A single
 deterministic renderer owns the HTML, CSS, live refresh, and interaction code;
 the agent does not design a new page for each project.
 
+External CI and review waits stay visible without blocking independent learning
+nodes. Before a first code change, the route also checks the project's actual
+formatter, linter, CI rules, and local review conventions.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

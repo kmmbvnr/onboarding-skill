@@ -14,6 +14,11 @@ For each open blocker, name `waiting_for`, the blocked codenames, and the next
 action. Do not report the whole onboarding as blocked while another useful node
 is available.
 
+List `waiting` nodes separately from blockers. For each one, name who or what
+the route waits for, `check_after`, and the read-only check. Do not ask the
+supervisor to unblock ordinary CI or review latency. Show the independent next
+node when one is ready.
+
 ## Daily report
 
 Use sessions for the current date. Save `.onboarding/reports/YYYY-MM-DD.md`.
@@ -30,6 +35,9 @@ Can now:
 
 Blockers or open questions:
 - <item, owner, and needed action>
+
+External waits:
+- <item, waiting for, and next check>
 
 Next:
 - <codename and outcome>
@@ -55,6 +63,9 @@ Needs supervision:
 
 Remaining blockers or gaps:
 - <item and next action>
+
+External waits:
+- <item and next check>
 
 Suggested next work:
 - <small real task or ownership area>

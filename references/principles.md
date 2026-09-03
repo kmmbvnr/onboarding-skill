@@ -28,6 +28,10 @@ Use these rules:
   tool or package, input and output, then internal code.
 - Explain a call or state path as a short input-to-output story. Do not accept
   "understood" as evidence of learning.
+- Teach code style from project rules, tool configuration, and nearby code.
+  Separate tool-enforced checks from review-only conventions.
+- Treat CI, review, approval, and replies as asynchronous waits. Keep an
+  independent learning branch open.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.
 - Use a buddy for company context, ownership, and decisions that the repository cannot answer.
