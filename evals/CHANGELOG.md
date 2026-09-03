@@ -1,5 +1,17 @@
 # Eval-driven changes
 
+## 2026-09-03 — guided code discovery for beginners
+
+- Source: human review of the first `EVENT-RIVER` lesson.
+- Evidence: a theory-only learner was told to read several source files and
+  produce a five-transition trace. The paths existed in the HTML map but were
+  absent from the coach message.
+- Change: the coach opens and shows one focused excerpt at a time, repeats the
+  clickable path in chat, and uses two to four choice-based checks before short
+  free recall. A beginner's first trace is split into small adjacent hops.
+- Validation: skill validation and twelve deterministic tests pass. A fresh
+  behavioral trace remains pending.
+
 ## 2026-09-03 — opening the first map is a required action
 
 - Source: repeated human trial in Together.

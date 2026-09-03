@@ -51,6 +51,10 @@ independent branch while another person or team completes the request.
 The skill does not invent product work. A real code change must refer to a
 supervisor task, issue, confirmed bug, agreed failing test, or explicit TODO.
 
+For a beginner, the coach shows one focused source excerpt at a time and uses
+short choice-based checks. It does not assign a batch of files as the first
+action.
+
 ## Evaluation
 
 The `evals/` directory contains isolated behavioral tests for the skill. Eval

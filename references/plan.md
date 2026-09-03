@@ -103,6 +103,12 @@ a one-to-three-node bridge before a large project trace: its purpose in this
 project, one minimal example, and one small learner change. Do not replace this
 bridge with "read these project files."
 
+For a beginner, do not make a multi-layer code trace the first ready node. Use
+the first chapter to cross the flow in small hops. A trace node should normally
+cover one concept or one to two adjacent transitions. Its first learner action
+must need no more than one new project file. The coach will inspect and show the
+relevant excerpt during the lesson.
+
 Avoid one fully linear chain when an access request can take time. Link each
 open blocker only to the nodes it prevents. Keep at least one useful independent
 node ready when project evidence allows it.

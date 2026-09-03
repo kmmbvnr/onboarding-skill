@@ -38,6 +38,12 @@ Use these definitions:
 - The first map is not fully delivered until the agent invokes an opener. If
   browser launch is blocked, it must request GUI permission and retry with the
   platform opener. Merely reporting the HTML path is a finding.
+- For a beginner or theory-only learner, assigning several files and requesting
+  a multi-step trace in one turn is an unsupported jump. The coach must inspect
+  the code, repeat the current path in chat, show one small excerpt, and ask a
+  choice-based question. Paths present only in the HTML map are not sufficient.
+- Introduce at most one new project file per learner turn. Do not penalize a
+  compact challenge when the learner has already shown practical experience.
 
 Propose the smallest skill change supported by the evidence. Use an empty
 string when the trace does not justify a skill change. Do not edit files.

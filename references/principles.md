@@ -20,6 +20,8 @@ Use these rules:
 - Use a small lab outside product code when a required technology is missing.
 - Treat theory without practice as a practical gap. Use a minimal example and
   one learner change before a large project trace.
+- For a beginner, show one small source excerpt and ask one choice-based
+  question at a time. Do not assign a batch of files as the first action.
 - Move from explanation to retrieval, project inspection, and a real low-risk task.
 - Increase the task radius after the learner shows evidence.
 - Use a buddy for company context, ownership, and decisions that the repository cannot answer.

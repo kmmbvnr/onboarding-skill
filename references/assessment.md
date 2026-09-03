@@ -83,5 +83,10 @@ first project trace:
 Use one to three nodes of 5 to 15 minutes. Skip or shorten the bridge when the
 learner produces equivalent practical evidence.
 
+Default to questions with three or four answer choices during this bridge. Add
+an "I am not sure" choice. Show one small example or project excerpt before the
+question. Do not ask for a blank-page architecture explanation as the first
+practical check.
+
 Stop the initial assessment when the first chapter is tailored and the learner
 has a safe next action. Continue assessment just in time during later nodes.

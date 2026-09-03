@@ -24,7 +24,30 @@ node.
 
 ## Teach
 
-Inspect the relevant project files before the lesson. Then use this loop:
+Inspect the relevant project files before the lesson. Do not assume that the
+learner saw the paths in the HTML map. Repeat the exact path needed for the
+current action in the chat.
+
+For a beginner or a learner with theory but no practice, guide discovery:
+
+1. Select one small concept or one adjacent transition in the project flow.
+2. Open the relevant file yourself with a file-reading tool.
+3. Give a clickable absolute file link with a line number. Show only the
+   relevant 5–20 lines, or a short safe summary when the source contains
+   sensitive data.
+4. Ask one decision question with three or four answer choices. Include an "I
+   am not sure" choice. Wait for the answer.
+5. Give short feedback, then show the next file or action.
+
+Introduce at most one new project file per learner turn. A node can contain
+several `project_paths`, but reveal them one at a time. Do not say "read these
+files and send a trace" as one action.
+
+Use two to four small checks across a beginner node. Prefer choices, ordering,
+matching, or prediction before free recall. Reduce the support after correct
+answers. End with one short retrieval that matches the node evidence.
+
+For an experienced learner, use the compact loop:
 
 1. State the node goal and its value to the learner's work.
 2. Ask for a prediction or prior explanation.
@@ -33,7 +56,10 @@ Inspect the relevant project files before the lesson. Then use this loop:
 5. Give direct feedback. Explain one gap at a time.
 6. Ask for a final retrieval, trace, run, or small change that matches the node evidence.
 
-Do not paste the answer before the learner tries. Do not turn the session into a lecture. Use a quiz only when it tests a decision or mental model.
+Do not paste the answer before the learner tries. A focused source excerpt is
+context, not an answer leak, when the learner still has to predict its behavior
+or connect it to the next step. Do not turn the session into a lecture. Use a
+quiz only when it tests a decision or mental model.
 
 Help the learner start the project and inspect errors. Confirm commands from project files before you suggest them.
 When a command cannot run or fails, use [environment.md](environment.md). Keep
